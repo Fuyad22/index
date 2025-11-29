@@ -28,6 +28,13 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
+        header.scrolled {
+            padding: 0.5rem 0;
+            background: rgba(102, 126, 234, 0.95);
+            box-shadow: 0 4px 25px rgba(0,0,0,0.15);
+            backdrop-filter: blur(6px);
+        }
+
         nav {
             max-width: 1200px;
             margin: 0 auto;
@@ -128,6 +135,11 @@
         .service-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 15px 40px rgba(102,126,234,0.2);
+        }
+
+        .service-card.is-active {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 18px 45px rgba(102,126,234,0.25);
         }
 
         .service-icon {
@@ -249,11 +261,36 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
 
+        .form-status {
+            margin-top: 1rem;
+            min-height: 1.5rem;
+            font-weight: 600;
+        }
+
+        .form-status.success {
+            color: #c6f6d5;
+        }
+
+        .form-status.error {
+            color: #fed7d7;
+        }
+
         footer {
             background: #2d3748;
             color: white;
             text-align: center;
             padding: 2rem;
+        }
+
+        .section-hidden {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .section-visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         @keyframes fadeInUp {
@@ -375,7 +412,7 @@
 
     <section id="contact" class="contact">
         <h2>Get In Touch</h2>
-        <form class="contact-form">
+        <form class="contact-form" novalidate>
             <div class="form-group">
                 <label for="name">Name</label>
                 <input type="text" id="name" name="name" required>
@@ -389,11 +426,126 @@
                 <textarea id="message" name="message" required></textarea>
             </div>
             <button type="submit" class="submit-button">Send Message</button>
+            <p class="form-status" role="status" aria-live="polite"></p>
         </form>
     </section>
 
     <footer>
         <p>&copy; 2024 JCDSoft. All rights reserved. Building the future, one line of code at a time.</p>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const header = document.querySelector('header');
+            const navLinks = document.querySelectorAll('.nav-links a');
+            const sections = Array.from(document.querySelectorAll('section'));
+            const revealTargets = sections.filter(section => !section.classList.contains('hero'));
+            const serviceCards = document.querySelectorAll('.service-card');
+            const contactForm = document.querySelector('.contact-form');
+            const formStatus = document.querySelector('.form-status');
+
+            const setStatus = (message, state) => {
+                if (!formStatus) {
+                    return;
+                }
+                formStatus.textContent = message;
+                formStatus.classList.remove('success', 'error');
+                if (state) {
+                    formStatus.classList.add(state);
+                }
+            };
+
+            const smoothScroll = targetId => {
+                const target = document.querySelector(targetId);
+                if (!target) {
+                    return;
+                }
+                const headerOffset = header ? header.offsetHeight : 0;
+                const elementPosition = target.getBoundingClientRect().top + window.scrollY;
+                const offsetPosition = elementPosition - headerOffset + 5;
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            };
+
+            window.addEventListener('scroll', () => {
+                if (!header) {
+                    return;
+                }
+                header.classList.toggle('scrolled', window.scrollY > 10);
+            });
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', event => {
+                    const href = link.getAttribute('href');
+                    if (!href || !href.startsWith('#')) {
+                        return;
+                    }
+                    event.preventDefault();
+                    smoothScroll(href);
+                });
+            });
+
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('section-visible');
+                        entry.target.classList.remove('section-hidden');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.2 });
+
+            revealTargets.forEach(section => {
+                section.classList.add('section-hidden');
+                observer.observe(section);
+            });
+
+            let serviceIndex = 0;
+            if (serviceCards.length) {
+                setInterval(() => {
+                    serviceCards.forEach(card => card.classList.remove('is-active'));
+                    serviceCards[serviceIndex].classList.add('is-active');
+                    serviceIndex = (serviceIndex + 1) % serviceCards.length;
+                }, 4000);
+
+                serviceCards.forEach(card => {
+                    card.addEventListener('mouseenter', () => {
+                        serviceCards.forEach(item => item.classList.remove('is-active'));
+                        card.classList.add('is-active');
+                    });
+                    card.addEventListener('mouseleave', () => card.classList.remove('is-active'));
+                });
+            }
+
+            const isValidEmail = value => /^[\w.-]+@[\w.-]+\.[A-Za-z]{2,}$/.test(value);
+
+            contactForm?.addEventListener('submit', event => {
+                event.preventDefault();
+                const formData = new FormData(contactForm);
+                const name = (formData.get('name') || '').toString().trim();
+                const email = (formData.get('email') || '').toString().trim();
+                const message = (formData.get('message') || '').toString().trim();
+
+                if (!name || !email || !message) {
+                    setStatus('Please complete every field before sending.', 'error');
+                    return;
+                }
+
+                if (!isValidEmail(email)) {
+                    setStatus('That email does not look right. Try again?', 'error');
+                    return;
+                }
+
+                setStatus('Sending your message...', 'success');
+
+                setTimeout(() => {
+                    setStatus(`Thanks ${name}! We will reach out to ${email} shortly.`, 'success');
+                    contactForm.reset();
+                }, 800);
+            });
+        });
+    </script>
 </body>
 </html>
