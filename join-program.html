@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join MU Chatrodol Programs</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            background: radial-gradient(circle at top, rgba(16,185,129,0.25), transparent 55%),
+                        radial-gradient(circle at 20% 20%, rgba(59,130,246,0.2), transparent 40%),
+                        #0f172a;
+            color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a {
+            color: inherit;
+        }
+
+        header {
+            padding: 1.5rem clamp(1.5rem, 4vw, 4rem);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .brand span {
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        .brand a {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .back-link {
+            border: 1px solid rgba(248,250,252,0.4);
+            border-radius: 999px;
+            padding: 0.6rem 1.4rem;
+            text-decoration: none;
+            font-weight: 500;
+            color: #f8fafc;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .back-link:hover {
+            background: rgba(248,250,252,0.1);
+        }
+
+        main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            padding: clamp(2rem, 4vw, 4rem);
+        }
+
+        .intro {
+            background: rgba(15,23,42,0.75);
+            border: 1px solid rgba(248,250,252,0.08);
+            border-radius: 30px;
+            padding: clamp(2rem, 3vw, 3rem);
+            box-shadow: 0 35px 80px rgba(2,6,23,0.45);
+        }
+
+        .intro h1 {
+            margin: 0 0 1rem;
+            font-size: clamp(2rem, 3vw, 2.8rem);
+        }
+
+        .intro p {
+            color: rgba(248,250,252,0.85);
+            line-height: 1.7;
+        }
+
+        .form-card {
+            background: rgba(248,250,252,0.98);
+            border-radius: 30px;
+            padding: clamp(2rem, 3vw, 3rem);
+            color: #0f172a;
+            box-shadow: 0 35px 80px rgba(2,6,23,0.45);
+        }
+
+        form {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            display: block;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            border-radius: 16px;
+            border: 2px solid #e2e8f0;
+            padding: 0.95rem 1.1rem;
+            font-size: 1rem;
+            font-family: inherit;
+            background: white;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 4px rgba(16,185,129,0.15);
+        }
+
+        textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            border: none;
+            border-radius: 999px;
+            padding: 1rem 2.5rem;
+            background: linear-gradient(120deg, #10b981, #0ea5e9, #dc2626);
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 20px 40px rgba(16,185,129,0.35);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 55px rgba(16,185,129,0.45);
+        }
+
+        .status {
+            min-height: 1.5rem;
+            font-weight: 600;
+        }
+
+        .status.success {
+            color: #059669;
+        }
+
+        .status.error {
+            color: #dc2626;
+        }
+
+        .status.pending {
+            color: #d97706;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .back-link {
+                align-self: stretch;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="brand">
+            <a href="index.html">MU Chatrodol</a>
+            <span>Program Application</span>
+        </div>
+        <a class="back-link" href="index.html">&#8592; Back to Home</a>
+    </header>
+
+    <main>
+        <section class="intro">
+            <h1>Shape Campus Impact</h1>
+            <p>Tell us about your goals, strengths, and the community work you want to champion. Our leadership team reviews every submission weekly and pairs you with mentorship pods, outreach squads, or innovation labs that match your interests.</p>
+            <p>After you submit, you'll receive a confirmation email and an invitation to our orientation circle where you'll meet other new members.</p>
+        </section>
+
+        <section class="form-card">
+            <form id="joinProgramForm">
+                <div>
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" name="name" required>
+                </div>
+                <div>
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div>
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="Optional">
+                </div>
+                <div>
+                    <label for="department">Department</label>
+                    <input type="text" id="department" name="department" placeholder="e.g., Software Engineering" required>
+                </div>
+                <div>
+                    <label for="programInterest">Program Interest</label>
+                    <select id="programInterest" name="program">
+                        <option value="Leadership Accelerator">Leadership Accelerator</option>
+                        <option value="Community Outreach Crew">Community Outreach Crew</option>
+                        <option value="Innovation & Tech Lab">Innovation &amp; Tech Lab</option>
+                        <option value="Wellness & Peer Support">Wellness &amp; Peer Support</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="availability">Weekly Availability</label>
+                    <select id="availability" name="availability">
+                        <option value="5+ hours">5+ hours</option>
+                        <option value="3-5 hours">3-5 hours</option>
+                        <option value="1-2 hours">1-2 hours</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="motivation">Tell us why you want to join</label>
+                    <textarea id="motivation" name="motivation" required></textarea>
+                </div>
+                <button class="submit-btn" type="submit">Submit Application</button>
+                <p class="status" id="joinStatus" aria-live="polite"></p>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        const joinForm = document.getElementById('joinProgramForm');
+        const joinStatus = document.getElementById('joinStatus');
+
+        const setJoinStatus = (message, state) => {
+            if (!joinStatus) {
+                return;
+            }
+            joinStatus.textContent = message;
+            joinStatus.className = `status ${state || ''}`.trim();
+        };
+
+        joinForm?.addEventListener('submit', async event => {
+            event.preventDefault();
+            const formData = new FormData(joinForm);
+            const name = formData.get('name')?.toString().trim();
+            const email = formData.get('email')?.toString().trim();
+            const motivation = formData.get('motivation')?.toString().trim();
+
+            if (!name || !email || !motivation) {
+                setJoinStatus('Please complete the required fields before submitting.', 'error');
+                return;
+            }
+
+            const details = [
+                `Phone: ${formData.get('phone') || 'Not provided'}`,
+                `Department: ${formData.get('department') || 'Not provided'}`,
+                `Program Interest: ${formData.get('program')}`,
+                `Availability: ${formData.get('availability')}`,
+                `Motivation: ${motivation}`
+            ].join('\n');
+
+            const payload = {
+                name,
+                email,
+                message: `JOIN PROGRAM SUBMISSION:\n${details}`
+            };
+
+            setJoinStatus('Submitting your application...', 'pending');
+
+            try {
+                const response = await fetch('/.netlify/functions/submit-contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json().catch(() => ({}));
+                if (!response.ok || result.error) {
+                    throw new Error(result.error || 'Unable to submit right now');
+                }
+
+                setJoinStatus('Thank you! We will reach out with next steps very soon.', 'success');
+                joinForm.reset();
+            } catch (error) {
+                console.error('Join form failed', error);
+                setJoinStatus('Something went wrong. Please try again shortly.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

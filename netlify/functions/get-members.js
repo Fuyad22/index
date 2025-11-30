@@ -6,25 +6,22 @@ const fallbackMembers = [
   { name: 'Abu Tanim', role: 'Secretary', type: 'executive', department: 'LLB', bio: 'Keeps documentation organized and events on schedule.' }
 ];
 
-const jsonResponse = (statusCode, payload) => ({
-  statusCode,
-  headers: {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*'
-  },
-  body: JSON.stringify(payload)
-});
-
 export default async function handler(event) {
   if (event?.httpMethod && event.httpMethod !== 'GET') {
-    return jsonResponse(405, { error: 'Method not allowed' });
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+    });
   }
 
   if (!process.env.NETLIFY_DATABASE_URL) {
-    return jsonResponse(200, {
+    return new Response(JSON.stringify({
       source: 'fallback',
       members: fallbackMembers,
-      note: 'Set NETLIFY_DATABASE_URL to fetch live data from Neon.'
+      note: 'Using fallback data. Database not configured.'
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
   }
 
@@ -37,10 +34,10 @@ export default async function handler(event) {
         role,
         COALESCE(type, 'member') AS type,
         department,
-        photo_url AS photo,
+        photo AS photo,
         bio
       FROM members
-      ORDER BY sort_order NULLS LAST, name ASC;
+      ORDER BY name ASC;
     `;
 
     const members = rows.map((row, index) => ({
@@ -53,14 +50,19 @@ export default async function handler(event) {
       bio: row.bio
     }));
 
-    return jsonResponse(200, { source: 'database', members });
+    return new Response(JSON.stringify({ source: 'database', members }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+    });
   } catch (error) {
     console.error('Neon query failed', error);
-    return jsonResponse(500, {
-      source: 'error',
-      message: 'Unable to query Neon database.',
-      details: error.message,
+    return new Response(JSON.stringify({
+      source: 'fallback-after-error',
+      message: 'Database error, using fallback data.',
       members: fallbackMembers
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
   }
 }

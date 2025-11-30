@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>MU Chatrodol - Student Organization</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -20,23 +23,32 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             line-height: 1.6;
             color: #333;
+            padding-top: 76px;
         }
 
         header {
-            background: linear-gradient(135deg, #10b981 0%, #dc2626 100%);
+            background: rgba(15, 23, 42, 0.95);
             color: white;
             padding: 1rem 0;
             position: fixed;
             width: 100%;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            transition: padding 0.3s;
+            height: 76px;
+            box-shadow: 0 8px 30px rgba(15,23,42,0.25);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            transition: padding 0.3s, background 0.3s, box-shadow 0.3s;
         }
 
         header.scrolled {
             padding: 0.5rem 0;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            background: rgba(15, 23, 42, 0.85);
+            box-shadow: 0 12px 35px rgba(15,23,42,0.35);
+            border-bottom-color: rgba(255,255,255,0.15);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
         }
 
         nav {
@@ -52,6 +64,19 @@
             font-size: 1.8rem;
             font-weight: 800;
             letter-spacing: -0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.85rem;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .logo img {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.3);
         }
         nav ul {
             list-style: none;
@@ -85,11 +110,11 @@
         .hero {
             background: linear-gradient(135deg, #10b981 0%, #dc2626 100%);
             color: white;
-            padding: 150px 2rem 100px;
+            padding: 100px 2rem;
             text-align: center;
-            margin-top: 60px;
             position: relative;
             overflow: hidden;
+            min-height: calc(100vh - 76px);
         }
 
         .hero::before {
@@ -115,42 +140,145 @@
 
         .hero-slider {
             position: relative;
-            max-width: 900px;
+            max-width: 1100px;
             margin: 0 auto;
-            min-height: 260px;
+            min-height: 450px;
+            perspective: 1400px;
         }
 
         .hero-slide {
-            opacity: 0;
-            transform: translateY(30px) scale(0.98);
-            transition: opacity 0.6s ease, transform 0.6s ease;
             position: absolute;
             inset: 0;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 1.5rem;
-            padding: 0 1rem;
-            text-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+            justify-content: center;
+            gap: 2.5rem;
+            padding: 3.5rem;
+            border-radius: 35px;
+            overflow: hidden;
+            opacity: 0;
+            transform: translate3d(0, 40px, -100px) scale(0.95);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+            box-shadow: 0 45px 90px rgba(15, 23, 42, 0.35);
+            pointer-events: none;
         }
 
-        .hero-slide figure {
+        .hero-slide::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, rgba(15,23,42,0.85), rgba(15,23,42,0.3));
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .hero-slide .slide-media {
+            position: absolute;
+            inset: 0;
             margin: 0;
-            position: relative;
+            z-index: 0;
+            border-radius: inherit;
+            overflow: hidden;
+            display: block;
+            border: none;
+            padding: 0;
+            cursor: zoom-in;
+            background: transparent;
         }
 
-        .hero-slide img {
+        .hero-slide .slide-media img {
             width: 100%;
-            max-width: 420px;
-            border-radius: 20px;
-            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.35);
-            border: 3px solid rgba(255,255,255,0.35);
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 10s ease;
+        }
+
+        .hero-slide:hover .slide-media img {
+            transform: scale(1.08);
+        }
+
+        .hero-slide .slide-content {
+            position: relative;
+            z-index: 1;
+            max-width: 520px;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            padding: 2.5rem;
+            border-radius: 28px;
+            background: rgba(15, 23, 42, 0.12);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.2);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+
+        .hero-slide .slide-content .btn {
+            align-self: flex-start;
+        }
+
+        .hero-slide .hero-meta {
+            justify-content: flex-start;
         }
 
         .hero-slide.active {
             opacity: 1;
-            transform: translateY(0) scale(1);
+            transform: translate3d(0, 0, 0) scale(1);
             position: relative;
+            pointer-events: auto;
+        }
+
+        .hero-image-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            z-index: 3000;
+            backdrop-filter: blur(8px);
+        }
+
+        .hero-image-overlay[hidden] {
+            display: none;
+        }
+
+        .hero-image-overlay__content {
+            position: relative;
+            max-width: min(1200px, 90vw);
+            max-height: 90vh;
+            width: 100%;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+        }
+
+        .hero-image-overlay__content img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .hero-image-overlay__close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            border: none;
+            background: rgba(15,23,42,0.65);
+            color: white;
+            font-size: 1.5rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
         }
 
         .hero h1 {
@@ -267,6 +395,30 @@
             background: white;
             transform: scale(1.2);
         }
+
+        .flow-section {
+            position: relative;
+            opacity: 0;
+            transform: translate3d(0, 80px, 0) scale(0.97);
+            filter: blur(14px);
+            transition: opacity 0.85s ease, transform 0.85s ease, filter 0.85s ease;
+            will-change: transform, opacity, filter;
+        }
+
+        .flow-section.flow-left {
+            transform: translate3d(-90px, 0, 0) scale(0.97);
+        }
+
+        .flow-section.flow-right {
+            transform: translate3d(90px, 0, 0) scale(0.97);
+        }
+
+        .flow-section.in-view {
+            opacity: 1;
+            transform: translate3d(0, 0, 0) scale(1);
+            filter: blur(0);
+        }
+
 
         .container {
             max-width: 1200px;
@@ -762,6 +914,28 @@
                 font-size: 2.2rem;
             }
 
+            .hero-slider {
+                min-height: 460px;
+            }
+
+            .hero-slide {
+                padding: 2rem;
+            }
+
+            .hero-slide .slide-content {
+                text-align: center;
+                max-width: 100%;
+                padding: 1.8rem;
+            }
+
+            .hero-slide .slide-content .btn {
+                align-self: center;
+            }
+
+            .hero-slide .hero-meta {
+                justify-content: center;
+            }
+
             .about-content {
                 grid-template-columns: 1fr;
             }
@@ -788,7 +962,10 @@
 <body>
     <header id="header">
         <nav>
-            <div class="logo">MU Chatrodol</div>
+            <div class="logo">
+                <img src="images/jatiotabadi-chatrodol-logo-png_seeklogo-368456.png" alt="MU Chatrodol logo">
+                <span>MU Chatrodol</span>
+            </div>
             <ul>
                 <li><a href="#home">Home</a></li>
                 <li><a href="#about">About</a></li>
@@ -796,12 +973,13 @@
                 <li><a href="#members">Members</a></li>
                 <li><a href="#events">Events</a></li>
                 <li><a href="#contact">Contact</a></li>
+                <li><a href="join-program.html">Join Program</a></li>
             </ul>
-        </nav>
-    </header>
-
-    <section id="home" class="hero">
-        <div class="hero-content">
+        <nav>
+            <a class="logo" href="#home">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2310b981'/%3E%3Cstop offset='70%25' stop-color='%23dc2626'/%3E%3Cstop offset='100%25' stop-color='%23f97316'/%3E%3C/linearGradient%3E%3Cfilter id='shadow' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeDropShadow dx='0' dy='6' stdDeviation='6' flood-color='rgba(15,23,42,0.35)'/%3E%3C/filter%3E%3C/defs%3E%3Crect x='10' y='10' width='100' height='100' rx='26' fill='url(%23g)' filter='url(%23shadow)'/%3E%3Cpath d='M38 85L60 35l22 50' fill='none' stroke='%23fff' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='60' cy='52' r='9' fill='%23fff'/%3E%3C/svg%3E" alt="MU Chatrodol logo">
+                <span>MU Chatrodol</span>
+            </a>
             <div class="hero-slider" id="heroSlider" aria-live="polite"></div>
             <div class="hero-controls">
                 <div class="hero-nav-buttons">
@@ -813,7 +991,7 @@
         </div>
     </section>
 
-    <section id="about" class="container">
+    <section id="about" class="container flow-section">
         <h2 class="section-title">About Us</h2>
         <p class="section-subtitle">Building tomorrow's leaders today</p>
         <div class="about-content">
@@ -845,7 +1023,7 @@
         </div>
     </section>
 
-    <section id="activities" class="container">
+    <section id="activities" class="container flow-section">
         <h2 class="section-title">Our Activities</h2>
         <p class="section-subtitle">Diverse programs for holistic development</p>
         <div class="cards">
@@ -868,7 +1046,7 @@
         </div>
     </section>
 
-    <section id="members" class="members-section container">
+    <section id="members" class="members-section container flow-section">
         <h2 class="section-title">Our Team</h2>
         <p class="section-subtitle">Meet the passionate individuals driving our mission</p>
         
@@ -884,7 +1062,7 @@
         </div>
     </section>
 
-    <section id="events" class="events container">
+    <section id="events" class="events container flow-section">
         <h2 class="section-title">Upcoming Events</h2>
         <p class="section-subtitle">Join us at our exciting upcoming activities</p>
         <div class="event-list">
@@ -906,7 +1084,7 @@
         </div>
     </section>
 
-    <section id="contact" class="container">
+    <section id="contact" class="container flow-section">
         <h2 class="section-title">Get In Touch</h2>
         <p class="section-subtitle">We'd love to hear from you</p>
         <form class="contact-form" id="contactForm">
@@ -949,6 +1127,13 @@
         </div>
     </div>
 
+    <div class="hero-image-overlay" id="heroImageOverlay" hidden aria-hidden="true">
+        <div class="hero-image-overlay__content">
+            <button class="hero-image-overlay__close" id="heroImageOverlayClose" aria-label="Close full-screen image">&times;</button>
+            <img id="heroImageOverlayImg" alt="Full-screen hero slide">
+        </div>
+    </div>
+
     <script>
         // Hero slides data
         const heroSlides = [
@@ -966,7 +1151,7 @@
                 title: "Leadership & Service",
                 subtitle: "Hands-on leadership programs that strengthen confidence and real-world problem solving.",
                 ctaText: "Join a Program",
-                ctaLink: "#activities",
+                ctaLink: "join-program.html",
                 meta: ["Mentorship Pods", "Weekly Workshops"],
                 background: "linear-gradient(135deg, rgba(16,185,129,0.9) 0%, rgba(20,184,166,0.9) 100%)",
                 image: "images/pro-vc.jpg",
@@ -979,7 +1164,8 @@
                 ctaLink: "#events",
                 meta: ["Community Outreach", "Wellness Support"],
                 background: "linear-gradient(135deg, rgba(168,85,247,0.9) 0%, rgba(220,38,38,0.9) 100%)",
-                imageAlt: "Volunteer efforts making community impact"
+                image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1400&q=80",
+                imageAlt: "Volunteers working together to help the community"
             }
         ];
 
@@ -1033,8 +1219,41 @@
         const heroSection = document.getElementById('home');
         const heroPrevBtn = document.getElementById('heroPrev');
         const heroNextBtn = document.getElementById('heroNext');
+        const heroImageOverlay = document.getElementById('heroImageOverlay');
+        const heroImageOverlayImg = document.getElementById('heroImageOverlayImg');
+        const heroImageOverlayClose = document.getElementById('heroImageOverlayClose');
         let heroActiveIndex = 0;
         let heroIntervalId;
+        let heroOverlayOpen = false;
+
+        const openHeroImageOverlay = (src, altText) => {
+            if (!heroImageOverlay || !heroImageOverlayImg) {
+                return;
+            }
+            stopHeroAutoplay();
+            heroOverlayOpen = true;
+            heroImageOverlayImg.src = src;
+            heroImageOverlayImg.alt = altText || 'Hero highlight image';
+            heroImageOverlay.removeAttribute('hidden');
+            heroImageOverlay.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+            heroImageOverlayClose?.focus();
+        };
+
+        const closeHeroImageOverlay = () => {
+            if (!heroImageOverlay) {
+                return;
+            }
+            heroOverlayOpen = false;
+            heroImageOverlay.setAttribute('hidden', '');
+            heroImageOverlay.setAttribute('aria-hidden', 'true');
+            if (heroImageOverlayImg) {
+                heroImageOverlayImg.removeAttribute('src');
+                heroImageOverlayImg.removeAttribute('alt');
+            }
+            document.body.style.overflow = '';
+            startHeroAutoplay();
+        };
 
         const renderHeroSlides = () => {
             if (!heroSliderEl || !heroDotsEl) {
@@ -1046,13 +1265,21 @@
             heroSlides.forEach((slide, index) => {
                 const slideEl = document.createElement('div');
                 slideEl.className = 'hero-slide';
+                const safeAlt = (slide.imageAlt || slide.title || 'Hero highlight').replace(/"/g, '&quot;');
+                const mediaMarkup = slide.image
+                    ? `<button class="slide-media" type="button" data-image="${slide.image}" data-image-alt="${safeAlt}" aria-label="View ${safeAlt} in full screen">
+                            <img src="${slide.image}" alt="${safeAlt}" loading="lazy">
+                       </button>`
+                    : '';
                 slideEl.innerHTML = `
-                    ${slide.image ? `<figure><img src="${slide.image}" alt="${slide.imageAlt || slide.title}" loading="lazy"></figure>` : ''}
-                    <h1>${slide.title}</h1>
-                    <p>${slide.subtitle}</p>
-                    <a href="${slide.ctaLink}" class="btn">${slide.ctaText}</a>
-                    <div class="hero-meta">
-                        ${slide.meta.map(meta => `<span>✳ ${meta}</span>`).join('')}
+                    ${mediaMarkup}
+                    <div class="slide-content">
+                        <h1>${slide.title}</h1>
+                        <p>${slide.subtitle}</p>
+                        <a href="${slide.ctaLink}" class="btn">${slide.ctaText}</a>
+                        <div class="hero-meta">
+                            ${slide.meta.map(meta => `<span>✳ ${meta}</span>`).join('')}
+                        </div>
                     </div>
                 `;
                 heroSliderEl.appendChild(slideEl);
@@ -1112,13 +1339,56 @@
             startHeroAutoplay();
         });
 
+        heroSliderEl?.addEventListener('click', event => {
+            const trigger = event.target.closest('.slide-media');
+            if (!trigger) {
+                return;
+            }
+            const imageSrc = trigger.dataset.image || trigger.querySelector('img')?.src;
+            const imageAlt = trigger.dataset.imageAlt || trigger.querySelector('img')?.alt || 'Hero highlight image';
+            if (imageSrc) {
+                openHeroImageOverlay(imageSrc, imageAlt);
+            }
+        });
+
         const heroHoverTarget = heroSliderEl?.parentElement;
         heroHoverTarget?.addEventListener('mouseenter', stopHeroAutoplay);
         heroHoverTarget?.addEventListener('mouseleave', startHeroAutoplay);
 
+        heroImageOverlayClose?.addEventListener('click', closeHeroImageOverlay);
+
+        heroImageOverlay?.addEventListener('click', event => {
+            if (event.target === heroImageOverlay) {
+                closeHeroImageOverlay();
+            }
+        });
+
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && heroOverlayOpen) {
+                closeHeroImageOverlay();
+            }
+        });
+
         renderHeroSlides();
         goToHeroSlide(0);
         startHeroAutoplay();
+
+        // Flow-in body sections
+        const flowSections = Array.from(document.querySelectorAll('.flow-section'));
+        flowSections.forEach((section, index) => {
+            section.classList.add(index % 2 === 0 ? 'flow-left' : 'flow-right');
+        });
+
+        const flowObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                    flowObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.35, rootMargin: '0px 0px -50px 0px' });
+
+        flowSections.forEach(section => flowObserver.observe(section));
 
         // Modal references
         const memberModal = document.getElementById('memberModal');
@@ -1167,7 +1437,7 @@
             }
             memberModal.classList.remove('active');
             memberModal.setAttribute('aria-hidden', 'true');
-            modalPhoto.removeAttribute('src');
+            modalPhoto.removeAttribute('src');            http://localhost:8888
             if (lastFocusedElement) {
                 lastFocusedElement.focus();
             }
