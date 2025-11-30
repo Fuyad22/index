@@ -40,7 +40,7 @@
         }
 
         nav {
-            max-width: 1200px;
+        const fallbackMembers = [
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
@@ -54,6 +54,33 @@
             letter-spacing: -0.5px;
         }
 
+        let members = [...fallbackMembers];
+
+        const normalizeMember = (member, index) => ({
+            name: member.name ?? `Member ${index + 1}`,
+            role: member.role ?? 'Member',
+            type: member.type ?? 'member',
+            department: member.department ?? 'General Studies',
+            photo: member.photo ?? '',
+            bio: member.bio ?? 'This member will add their profile soon.'
+        });
+
+        const fetchMembers = async () => {
+            try {
+                const response = await fetch('/.netlify/functions/get-members');
+                if (!response.ok) {
+                    throw new Error(`Failed to load members (${response.status})`);
+                }
+                const payload = await response.json();
+                if (Array.isArray(payload.members) && payload.members.length) {
+                    members = payload.members.map(normalizeMember);
+                    return;
+                }
+            } catch (error) {
+                console.warn('Falling back to embedded members', error);
+            }
+            members = [...fallbackMembers];
+        };
         nav ul {
             list-style: none;
             display: flex;
@@ -1275,8 +1302,13 @@
             this.reset();
         });
 
+        const initMembers = async () => {
+            await fetchMembers();
+            loadMembers();
+        };
+
         // Load members on page load
-        loadMembers();
+        initMembers();
 
         // Event item click animation
         document.querySelectorAll('.event-item').forEach(item => {
@@ -1290,3 +1322,16 @@
     </script>
 </body>
 </html>
+
+import { neon } from '@netlify/neon';
+
+const sql = neon(); // picks up NETLIFY_DATABASE_URL
+export default async (req, res) => {
+  try {
+    const postId = req.query.id;
+    const [post] = await sql`SELECT * FROM posts WHERE id = ${postId}`;
+    return res.status(200).json(post);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+};

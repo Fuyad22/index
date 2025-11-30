@@ -1,0 +1,9 @@
+[build]
+  command = ""
+  publish = "."
+
+[functions]
+  directory = "netlify/functions"
+
+[dev]
+  autoLaunch = false
