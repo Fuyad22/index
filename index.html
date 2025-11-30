@@ -40,7 +40,7 @@
         }
 
         nav {
-        const fallbackMembers = [
+            max-width: 1200px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
@@ -53,34 +53,6 @@
             font-weight: 800;
             letter-spacing: -0.5px;
         }
-
-        let members = [...fallbackMembers];
-
-        const normalizeMember = (member, index) => ({
-            name: member.name ?? `Member ${index + 1}`,
-            role: member.role ?? 'Member',
-            type: member.type ?? 'member',
-            department: member.department ?? 'General Studies',
-            photo: member.photo ?? '',
-            bio: member.bio ?? 'This member will add their profile soon.'
-        });
-
-        const fetchMembers = async () => {
-            try {
-                const response = await fetch('/.netlify/functions/get-members');
-                if (!response.ok) {
-                    throw new Error(`Failed to load members (${response.status})`);
-                }
-                const payload = await response.json();
-                if (Array.isArray(payload.members) && payload.members.length) {
-                    members = payload.members.map(normalizeMember);
-                    return;
-                }
-            } catch (error) {
-                console.warn('Falling back to embedded members', error);
-            }
-            members = [...fallbackMembers];
-        };
         nav ul {
             list-style: none;
             display: flex;
@@ -617,6 +589,24 @@
             resize: vertical;
         }
 
+        .form-status {
+            margin-top: 1rem;
+            font-weight: 600;
+            min-height: 1.5rem;
+        }
+
+        .form-status.success {
+            color: #10b981;
+        }
+
+        .form-status.error {
+            color: #dc2626;
+        }
+
+        .form-status.pending {
+            color: #f59e0b;
+        }
+
         .submit-btn {
             background: linear-gradient(135deg, #10b981 0%, #dc2626 100%);
             color: white;
@@ -922,17 +912,18 @@
         <form class="contact-form" id="contactForm">
             <div class="form-group">
                 <label for="name">Name</label>
-                <input type="text" id="name" required>
+                <input type="text" id="name" name="name" required>
             </div>
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" required>
+                <input type="email" id="email" name="email" required>
             </div>
             <div class="form-group">
                 <label for="message">Message</label>
-                <textarea id="message" required></textarea>
+                <textarea id="message" name="message" required></textarea>
             </div>
             <button type="submit" class="submit-btn">Send Message</button>
+            <p class="form-status" id="contactStatus" role="status" aria-live="polite"></p>
         </form>
     </section>
 
@@ -992,8 +983,8 @@
             }
         ];
 
-        // Member data
-        const members = [
+        // Member data (fetched from Netlify function with fallback)
+        const fallbackMembers = [
             { name: "Kawser Ahmed", role: "President", type: "executive", department: "LLB", photo: "images/581317404_18053084927652359_318468152958173845_n.jpg", bio: "Kawser guides MU Chatrodol's strategic direction and mentors every executive to keep projects aligned with our mission." },
             { name: "Md Jakariya Ahmed", role: "Senior Vice President", type: "executive", department: "English", photo: "images/121622784_739956223227261_407557725966673797_n.jpg", bio: "Jakariya facilitates cross-campus partnerships and curates leadership clinics focused on communication." },
             { name: "Abu Tanim", role: "Secretary", type: "executive", department: "LLB", photo: "images/591315181_1578738500004585_4102081963493087870_n.jpg", bio: "Abu keeps documentation spotless and ensures every resolution or event brief is delivered on time." },
@@ -1007,6 +998,34 @@
             { name: "Omar Farooq", role: "Active Member", type: "member", department: "Mathematics", bio: "Omar tutors juniors in quantitative subjects and runs weekly study labs." },
             { name: "Zainab Hussain", role: "Active Member", type: "member", department: "Literature", bio: "Zainab curates the organization's newsletter and creative showcases." }
         ];
+
+        let members = [...fallbackMembers];
+
+        const normalizeMember = (member, index) => ({
+            name: member.name ?? `Member ${index + 1}`,
+            role: member.role ?? 'Member',
+            type: member.type ?? 'member',
+            department: member.department ?? 'General Studies',
+            photo: member.photo ?? '',
+            bio: member.bio ?? 'This member will add their profile soon.'
+        });
+
+        const fetchMembers = async () => {
+            try {
+                const response = await fetch('/.netlify/functions/get-members');
+                if (!response.ok) {
+                    throw new Error(`Failed to load members (${response.status})`);
+                }
+                const payload = await response.json();
+                if (Array.isArray(payload.members) && payload.members.length) {
+                    members = payload.members.map(normalizeMember);
+                    return;
+                }
+            } catch (error) {
+                console.warn('Falling back to embedded members', error);
+            }
+            members = [...fallbackMembers];
+        };
 
         // Hero slider references
         const heroSliderEl = document.getElementById('heroSlider');
@@ -1295,11 +1314,58 @@
             statsObserver.observe(statsSection);
         }
 
-        // Form submission
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Thank you for your message! We will get back to you soon.');
-            this.reset();
+        const contactForm = document.getElementById('contactForm');
+        const contactStatus = document.getElementById('contactStatus');
+
+        const setContactStatus = (message, state) => {
+            if (!contactStatus) {
+                return;
+            }
+            contactStatus.textContent = message;
+            contactStatus.classList.remove('success', 'error', 'pending');
+            if (state) {
+                contactStatus.classList.add(state);
+            }
+        };
+
+        contactForm?.addEventListener('submit', async event => {
+            event.preventDefault();
+            const formData = new FormData(contactForm);
+            const payload = {
+                name: formData.get('name')?.toString().trim(),
+                email: formData.get('email')?.toString().trim(),
+                message: formData.get('message')?.toString().trim()
+            };
+
+            if (!payload.name || !payload.email || !payload.message) {
+                setContactStatus('Please complete every field before sending.', 'error');
+                return;
+            }
+
+            setContactStatus('Sending your message...', 'pending');
+
+            try {
+                const response = await fetch('/.netlify/functions/submit-contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json().catch(() => ({}));
+
+                if (!response.ok || result.error) {
+                    throw new Error(result.error || 'Unable to send message right now.');
+                }
+
+                const confirmation = result.message || 'Thank you for your message! We will get back to you soon.';
+                setContactStatus(confirmation, 'success');
+                contactForm.reset();
+            } catch (error) {
+                console.error('Contact form submission failed', error);
+                setContactStatus('We could not send your message. Please try again later.', 'error');
+            }
         });
 
         const initMembers = async () => {
@@ -1322,16 +1388,3 @@
     </script>
 </body>
 </html>
-
-import { neon } from '@netlify/neon';
-
-const sql = neon(); // picks up NETLIFY_DATABASE_URL
-export default async (req, res) => {
-  try {
-    const postId = req.query.id;
-    const [post] = await sql`SELECT * FROM posts WHERE id = ${postId}`;
-    return res.status(200).json(post);
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-};
