@@ -23,32 +23,33 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             line-height: 1.6;
             color: #333;
-            padding-top: 76px;
+            padding-top: 132px;
         }
 
         header {
-            background: rgba(15, 23, 42, 0.95);
+            background: rgba(15, 23, 42, 0.55);
             color: white;
-            padding: 1rem 0;
+            padding: 0.75rem 0;
             position: fixed;
-            width: 100%;
-            top: 0;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: min(1200px, calc(100% - 32px));
             z-index: 1000;
-            height: 76px;
-            box-shadow: 0 8px 30px rgba(15,23,42,0.25);
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            border-radius: 999px;
+            box-shadow: 0 18px 32px rgba(15,23,42,0.28);
+            border: 1px solid rgba(255,255,255,0.18);
             backdrop-filter: blur(18px);
             -webkit-backdrop-filter: blur(18px);
-            transition: padding 0.3s, background 0.3s, box-shadow 0.3s;
+            transition: background 0.3s, box-shadow 0.3s, top 0.3s, width 0.3s;
         }
 
         header.scrolled {
-            padding: 0.5rem 0;
-            background: rgba(15, 23, 42, 0.85);
-            box-shadow: 0 12px 35px rgba(15,23,42,0.35);
-            border-bottom-color: rgba(255,255,255,0.15);
-            backdrop-filter: blur(22px);
-            -webkit-backdrop-filter: blur(22px);
+            top: 12px;
+            background: rgba(15, 23, 42, 0.72);
+            box-shadow: 0 22px 38px rgba(15,23,42,0.32);
+            border-color: rgba(255,255,255,0.25);
+            width: min(1200px, calc(100% - 24px));
         }
 
         nav {
@@ -956,6 +957,24 @@
             .section-title {
                 font-size: 2rem;
             }
+
+            body {
+                padding-top: 118px;
+            }
+
+            header {
+                width: calc(100% - 20px);
+                top: 14px;
+            }
+
+            header.scrolled {
+                top: 10px;
+                width: calc(100% - 16px);
+            }
+
+            nav {
+                padding: 0 1.5rem;
+            }
         }
     </style>
 </head>
@@ -975,9 +994,13 @@
                 <li><a href="#contact">Contact</a></li>
                 <li><a href="join-program.html">Join Program</a></li>
             </ul>
-        <nav>
+        </nav>
+    </header>
+
+    <section id="home" class="hero">
+        <div class="hero-content">
             <a class="logo" href="#home">
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2310b981'/%3E%3Cstop offset='70%25' stop-color='%23dc2626'/%3E%3Cstop offset='100%25' stop-color='%23f97316'/%3E%3C/linearGradient%3E%3Cfilter id='shadow' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeDropShadow dx='0' dy='6' stdDeviation='6' flood-color='rgba(15,23,42,0.35)'/%3E%3C/filter%3E%3C/defs%3E%3Crect x='10' y='10' width='100' height='100' rx='26' fill='url(%23g)' filter='url(%23shadow)'/%3E%3Cpath d='M38 85L60 35l22 50' fill='none' stroke='%23fff' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='60' cy='52' r='9' fill='%23fff'/%3E%3C/svg%3E" alt="MU Chatrodol logo">
+                <img src="images/jatiotabadi-chatrodol-logo-png_seeklogo-368456.png" alt="MU Chatrodol logo">
                 <span>MU Chatrodol</span>
             </a>
             <div class="hero-slider" id="heroSlider" aria-live="polite"></div>
@@ -1176,13 +1199,14 @@
             { name: "Abu Tanim", role: "Secretary", type: "executive", department: "LLB", photo: "images/591315181_1578738500004585_4102081963493087870_n.jpg", bio: "Abu keeps documentation spotless and ensures every resolution or event brief is delivered on time." },
             { name: "Md Fuyad Hassan", role: "Senior Joint Secretary", type: "executive", department: "Software Engineering", photo: "images/WhatsApp Image 2025-11-30 at 13.29.04_714dacf6.jpg", bio: "Fuyad blends technology with community work, introducing digital tools that make volunteering smoother." },
             { name: "Naimur Rahman Talukder Nafees", role: "Organizing Secretary", type: "executive", department: "LLB", photo: "images/Screenshot 2025-11-30 133617.png", bio: "Nafees coordinates large-scale events and trains new volunteers on inclusive facilitation." },
-            { name: "Sadia Ahmed", role: "PR Manager", type: "committee", department: "Communications", photo: "https://i.pravatar.cc/150?img=47", bio: "Sadia oversees storytelling, media outreach, and keeps alumni updated on our milestones." },
-            { name: "Tariq Mahmud", role: "Social Media Lead", type: "committee", department: "Digital Media", bio: "Tariq designs content calendars that highlight student voices and event recaps." },
-            { name: "Yasmin Haque", role: "Volunteer Coordinator", type: "committee", department: "Social Work", bio: "Yasmin mentors new members and pairs them with projects that match their passion." },
-            { name: "Ibrahim Chowdhury", role: "Active Member", type: "member", department: "Biology", bio: "Ibrahim leads sustainability drives and campus clean-up efforts." },
-            { name: "Layla Begum", role: "Active Member", type: "member", department: "Psychology", bio: "Layla facilitates wellness circles that prioritize empathy and peer support." },
-            { name: "Omar Farooq", role: "Active Member", type: "member", department: "Mathematics", bio: "Omar tutors juniors in quantitative subjects and runs weekly study labs." },
-            { name: "Zainab Hussain", role: "Active Member", type: "member", department: "Literature", bio: "Zainab curates the organization's newsletter and creative showcases." }
+            { name: "Ashraf Ahmed", role: "Vice President", type: "committee", department: "Communications", photo: "#", bio: "Sadia oversees storytelling, media outreach, and keeps alumni updated on our milestones." },
+            { name: "Ahsan Ahmed Rifat", role: "Vice President", type: "committee", department: "Digital Media", bio: "Tariq designs content calendars that highlight student voices and event recaps." },
+            { name: "Muzaddid Chowdhury", role: "First Joint Secretary", type: "committee", department: "Computer Science and Engineering", bio: "Yasmin mentors new members and pairs them with projects that match their passion." },
+            { name: "Marzan Ahmed Shimul", role: "Joint Secretary", type: "member", department: "Computer Science and Engineering", bio: "Ibrahim leads sustainability drives and campus clean-up efforts." },
+            { name: "Ishtiak Uddin Shafi", role: "Office Secretary", type: "member", department: "Computer Science and Engineering", bio: "Layla facilitates wellness circles that prioritize empathy and peer support." },
+            { name: "Emad Ahmed Rigve", role: "Literary and Publishing Editor", type: "member", department: "BBA", bio: "Omar tutors juniors in quantitative subjects and runs weekly study labs." },
+            { name: "Nadir Hussain", role: "Co Organizing Secretary", type: "member", department: "Literature", bio: "Zainab curates the organization's newsletter and creative showcases." },
+            {name: "Rahib", role: "Active Member", type: "member", department: "Literature", bio: "Zainab curates the organization's newsletter and creative showcases." }
         ];
 
         const members = [...fallbackMembers];

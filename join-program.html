@@ -199,7 +199,7 @@
         </section>
 
         <section class="form-card">
-            <form id="joinProgramForm">
+            <form id="joinProgramForm" action="https://formspree.io/f/manrnzyn" method="POST">
                 <div>
                     <label for="fullName">Full Name</label>
                     <input type="text" id="fullName" name="name" required>
@@ -255,7 +255,7 @@
             joinStatus.className = `status ${state || ''}`.trim();
         };
 
-        joinForm?.addEventListener('submit', event => {
+        joinForm?.addEventListener('submit', async event => {
             event.preventDefault();
             const formData = new FormData(joinForm);
             const name = formData.get('name')?.toString().trim();
@@ -267,8 +267,25 @@
                 return;
             }
 
-            setJoinStatus('Thank you! Your application has been received. We will reach out with next steps very soon.', 'success');
-            joinForm.reset();
+            setJoinStatus('Submitting your application...', 'pending');
+
+            try {
+                const response = await fetch(joinForm.action, {
+                    method: joinForm.method || 'POST',
+                    headers: { 'Accept': 'application/json' },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Form submission failed (${response.status})`);
+                }
+
+                setJoinStatus('Thank you! Your application has been received. We will reach out with next steps very soon.', 'success');
+                joinForm.reset();
+            } catch (error) {
+                console.error('Join form submission failed', error);
+                setJoinStatus('Something went wrong while submitting. Please try again in a moment.', 'error');
+            }
         });
     </script>
 </body>
