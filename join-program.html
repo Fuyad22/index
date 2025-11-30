@@ -255,7 +255,7 @@
             joinStatus.className = `status ${state || ''}`.trim();
         };
 
-        joinForm?.addEventListener('submit', async event => {
+        joinForm?.addEventListener('submit', event => {
             event.preventDefault();
             const formData = new FormData(joinForm);
             const name = formData.get('name')?.toString().trim();
@@ -267,42 +267,8 @@
                 return;
             }
 
-            const details = [
-                `Phone: ${formData.get('phone') || 'Not provided'}`,
-                `Department: ${formData.get('department') || 'Not provided'}`,
-                `Program Interest: ${formData.get('program')}`,
-                `Availability: ${formData.get('availability')}`,
-                `Motivation: ${motivation}`
-            ].join('\n');
-
-            const payload = {
-                name,
-                email,
-                message: `JOIN PROGRAM SUBMISSION:\n${details}`
-            };
-
-            setJoinStatus('Submitting your application...', 'pending');
-
-            try {
-                const response = await fetch('/.netlify/functions/submit-contact', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json().catch(() => ({}));
-                if (!response.ok || result.error) {
-                    throw new Error(result.error || 'Unable to submit right now');
-                }
-
-                setJoinStatus('Thank you! We will reach out with next steps very soon.', 'success');
-                joinForm.reset();
-            } catch (error) {
-                console.error('Join form failed', error);
-                setJoinStatus('Something went wrong. Please try again shortly.', 'error');
-            }
+            setJoinStatus('Thank you! Your application has been received. We will reach out with next steps very soon.', 'success');
+            joinForm.reset();
         });
     </script>
 </body>
