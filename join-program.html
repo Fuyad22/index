@@ -69,16 +69,16 @@
         main {
             flex: 1;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 2rem;
-            padding: clamp(2rem, 4vw, 4rem);
+            padding: clamp(1.75rem, 4vw, 4rem);
         }
 
         .intro {
             background: rgba(15,23,42,0.75);
             border: 1px solid rgba(248,250,252,0.08);
             border-radius: 30px;
-            padding: clamp(2rem, 3vw, 3rem);
+            padding: clamp(1.75rem, 3.5vw, 3rem);
             box-shadow: 0 35px 80px rgba(2,6,23,0.45);
         }
 
@@ -95,7 +95,7 @@
         .form-card {
             background: rgba(248,250,252,0.98);
             border-radius: 30px;
-            padding: clamp(2rem, 3vw, 3rem);
+            padding: clamp(1.75rem, 3.5vw, 3rem);
             color: #0f172a;
             box-shadow: 0 35px 80px rgba(2,6,23,0.45);
         }
@@ -180,6 +180,23 @@
                 text-align: center;
             }
         }
+
+        @media (max-width: 480px) {
+            main {
+                padding: 1.25rem;
+                gap: 1.5rem;
+            }
+
+            .intro,
+            .form-card {
+                padding: 1.5rem;
+                border-radius: 24px;
+            }
+
+            .submit-btn {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -217,10 +234,14 @@
                     <input type="text" id="department" name="department" placeholder="e.g., Software Engineering" required>
                 </div>
                 <div>
+                    <label for="id">ID</label>
+                    <input type="text" id="id" name="id" placeholder="e.g., 123-456-789" required>
+                </div>
+                <div>
                     <label for="programInterest">Program Interest</label>
                     <select id="programInterest" name="program">
-                        <option value="Leadership Accelerator">Leadership Accelerator</option>
-                        <option value="Community Outreach Crew">Community Outreach Crew</option>
+                        <option value="Leadership Accelerator">মিলাদ মাহফিল</option>
+                        <option value="Community Outreach Crew">সাপ্তাহিক মিটিং</option>
                         <option value="Innovation & Tech Lab">Innovation &amp; Tech Lab</option>
                         <option value="Wellness & Peer Support">Wellness &amp; Peer Support</option>
                     </select>
@@ -243,9 +264,16 @@
         </section>
     </main>
 
+    <script src="site-data.js"></script>
     <script>
         const joinForm = document.getElementById('joinProgramForm');
         const joinStatus = document.getElementById('joinStatus');
+
+        const dataModule = window.MUChatrodolData || {};
+        const storageKey = dataModule.STORAGE_KEY || 'mu-chatrodol-cms/v1';
+        const getDefaults = typeof dataModule.getDefaultData === 'function'
+            ? () => dataModule.getDefaultData()
+            : () => ({ applications: [] });
 
         const setJoinStatus = (message, state) => {
             if (!joinStatus) {
@@ -255,11 +283,46 @@
             joinStatus.className = `status ${state || ''}`.trim();
         };
 
+        const persistApplication = (application) => {
+            if (typeof window.localStorage === 'undefined') {
+                return;
+            }
+
+            let stored;
+            try {
+                const raw = window.localStorage.getItem(storageKey);
+                stored = raw ? JSON.parse(raw) : null;
+            } catch (error) {
+                console.warn('Unable to read stored applications', error);
+                stored = null;
+            }
+
+            if (!stored || typeof stored !== 'object') {
+                stored = getDefaults();
+            }
+
+            if (!Array.isArray(stored.applications)) {
+                stored.applications = [];
+            }
+
+            stored.applications.unshift({ ...application });
+
+            try {
+                window.localStorage.setItem(storageKey, JSON.stringify(stored));
+            } catch (error) {
+                console.warn('Unable to store application locally', error);
+            }
+        };
+
         joinForm?.addEventListener('submit', async event => {
             event.preventDefault();
             const formData = new FormData(joinForm);
             const name = formData.get('name')?.toString().trim();
             const email = formData.get('email')?.toString().trim();
+            const phone = formData.get('phone')?.toString().trim() || '';
+            const department = formData.get('department')?.toString().trim() || '';
+            const program = formData.get('program')?.toString().trim() || '';
+            const availability = formData.get('availability')?.toString().trim() || '';
             const motivation = formData.get('motivation')?.toString().trim();
 
             if (!name || !email || !motivation) {
@@ -268,6 +331,19 @@
             }
 
             setJoinStatus('Submitting your application...', 'pending');
+
+            const applicationRecord = {
+                id: `application-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+                name,
+                email,
+                phone,
+                department,
+                program,
+                availability,
+                motivation,
+                submittedAt: new Date().toISOString(),
+                status: 'new'
+            };
 
             try {
                 const response = await fetch(joinForm.action, {
@@ -280,6 +356,7 @@
                     throw new Error(`Form submission failed (${response.status})`);
                 }
 
+                persistApplication(applicationRecord);
                 setJoinStatus('Thank you! Your application has been received. We will reach out with next steps very soon.', 'success');
                 joinForm.reset();
             } catch (error) {

@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MU Chatrodol Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            color-scheme: light;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f1f5f9;
+            color: #0f172a;
+            min-height: 100vh;
+        }
+
+        header.admin-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: #0f172a;
+            color: white;
+            padding: 1.25rem clamp(1.5rem, 4vw, 4rem);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 12px 32px rgba(15, 23, 42, 0.25);
+        }
+
+        header.admin-header .brand {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        header.admin-header .brand a {
+            color: inherit;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.4rem;
+        }
+
+        header.admin-header button {
+            border: none;
+            border-radius: 999px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            transition: background 0.2s ease;
+        }
+
+        header.admin-header button:hover,
+        header.admin-header button:focus-visible {
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        main#adminApp {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: clamp(1.5rem, 4vw, 4rem);
+            display: grid;
+            gap: 2.5rem;
+        }
+
+        .metrics-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 18px;
+            padding: 1.75rem;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+        }
+
+        .metric-card span {
+            display: block;
+        }
+
+        .metric-value {
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: #0ea5e9;
+        }
+
+        .metric-label {
+            color: #475569;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        section.panel {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        section.panel header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        section.panel header h2 {
+            margin: 0;
+            font-size: 1.4rem;
+        }
+
+        .panel header button,
+        .panel header a {
+            border: none;
+            border-radius: 12px;
+            padding: 0.65rem 1.1rem;
+            background: #0ea5e9;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .panel header button:hover,
+        .panel header button:focus-visible,
+        .panel header a:hover,
+        .panel header a:focus-visible {
+            background: #0284c7;
+        }
+
+        .item-form {
+            display: grid;
+            gap: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 1.25rem 1.5rem;
+            background: rgba(241, 245, 249, 0.45);
+        }
+
+        .item-form .field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .item-form label {
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .item-form input,
+        .item-form textarea,
+        .item-form select {
+            border-radius: 12px;
+            border: 1px solid #cbd5f5;
+            padding: 0.75rem 0.95rem;
+            font-size: 1rem;
+            font-family: inherit;
+            background: white;
+        }
+
+        .item-form input[readonly],
+        .item-form textarea[readonly] {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .item-form textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .item-form .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .item-form button {
+            border: none;
+            border-radius: 10px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .item-form button[type="submit"] {
+            background: #10b981;
+            color: white;
+        }
+
+        .item-form button[type="submit"]:hover,
+        .item-form button[type="submit"]:focus-visible {
+            background: #059669;
+        }
+
+        .item-form .danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .item-form .danger:hover,
+        .item-form .danger:focus-visible {
+            background: #dc2626;
+        }
+
+        .empty-state {
+            margin: 0;
+            color: #64748b;
+            font-style: italic;
+        }
+
+        .inline-hint {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #0ea5e9;
+            color: white;
+            padding: 0.85rem 1.4rem;
+            border-radius: 12px;
+            box-shadow: 0 18px 45px rgba(14, 165, 233, 0.35);
+            font-weight: 600;
+        }
+
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.78);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            z-index: 20;
+        }
+
+        .login-card {
+            max-width: 360px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            display: grid;
+            gap: 1.2rem;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.35);
+        }
+
+        .login-card h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .login-card p {
+            margin: 0;
+            color: #64748b;
+            text-align: center;
+        }
+
+        .login-card label {
+            font-weight: 600;
+        }
+
+        .login-card input {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid #cbd5f5;
+            padding: 0.75rem 0.95rem;
+            font-size: 1rem;
+        }
+
+        .login-card button {
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem;
+            font-weight: 600;
+            background: #0ea5e9;
+            color: white;
+            cursor: pointer;
+        }
+
+        .login-card button:hover,
+        .login-card button:focus-visible {
+            background: #0284c7;
+        }
+
+        @media (max-width: 720px) {
+            main#adminApp {
+                grid-template-columns: minmax(0, 1fr);
+                padding: 1.5rem;
+            }
+
+            header.admin-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-overlay" id="loginOverlay">
+        <form class="login-card" id="loginForm">
+            <h1>MU Chatrodol Admin</h1>
+            <p>Enter the admin access key to continue.</p>
+            <div class="field">
+                <label for="adminPass">Access Key</label>
+                <input type="password" id="adminPass" name="password" autocomplete="current-password" required>
+            </div>
+            <button type="submit">Unlock Dashboard</button>
+            <p class="inline-hint">Default access key: <strong>mu-admin-2025</strong>. Change it after logging in.</p>
+        </form>
+    </div>
+
+    <header class="admin-header">
+        <div class="brand">
+            <a href="index.html">MU Chatrodol</a>
+            <span>Content Dashboard</span>
+        </div>
+        <div class="header-actions">
+            <button type="button" id="resetDataBtn">Reset to Defaults</button>
+            <button type="button" id="logoutBtn">Sign Out</button>
+        </div>
+    </header>
+
+    <main id="adminApp" hidden>
+        <section class="metrics-overview" id="metricsOverview"></section>
+
+        <section class="panel" id="heroPanel">
+            <header>
+                <h2>Hero Highlights</h2>
+                <button type="button" id="addHeroBtn">Add Highlight</button>
+            </header>
+            <p class="inline-hint">Update carousel headlines, call-to-action links, background gradients, and supporting badges.</p>
+            <div id="heroList"></div>
+        </section>
+
+        <section class="panel" id="membersPanel">
+            <header>
+                <h2>Team Directory</h2>
+                <button type="button" id="addMemberBtn">Add Member</button>
+            </header>
+            <p class="inline-hint">Member type controls which filter the profile appears under (executive, committee, or member).</p>
+            <div id="memberList"></div>
+        </section>
+
+        <section class="panel" id="eventsPanel">
+            <header>
+                <h2>Upcoming Events</h2>
+                <button type="button" id="addEventBtn">Add Event</button>
+            </header>
+            <div id="eventListAdmin"></div>
+        </section>
+
+        <section class="panel" id="statsPanel">
+            <header>
+                <h2>Impact Stats</h2>
+                <button type="button" id="addStatBtn">Add Stat</button>
+            </header>
+            <div id="statsList"></div>
+        </section>
+
+        <section class="panel" id="postsPanel">
+            <header>
+                <h2>News Posts</h2>
+                <button type="button" id="addPostBtn">Add Post</button>
+            </header>
+            <div id="postList"></div>
+        </section>
+
+        <section class="panel" id="applicationsPanel">
+            <header>
+                <h2>Program Applications</h2>
+            </header>
+            <p class="inline-hint">Submissions from the Join Program form appear here. Update status as you review each applicant.</p>
+            <div id="applicationList"></div>
+        </section>
+
+        <section class="panel" id="contactPanel">
+            <header>
+                <h2>Contact Messages</h2>
+            </header>
+            <p class="inline-hint">Messages from the Get In Touch form land here. Use notes to track follow-ups.</p>
+            <div id="contactList"></div>
+        </section>
+    </main>
+
+    <div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
+
+    <script src="site-data.js"></script>
+    <script>
+        const dataModule = window.MUChatrodolData || {};
+        const storageKey = dataModule.STORAGE_KEY || 'mu-chatrodol-cms/v1';
+        const getDefaults = typeof dataModule.getDefaultData === 'function'
+            ? () => dataModule.getDefaultData()
+            : () => ({ heroSlides: [], members: [], events: [], stats: [], posts: [] });
+
+        const sessionKey = 'mu-chatrodol-admin-session';
+        const ADMIN_PASSWORD = 'mu-admin-2025';
+
+        const loginOverlay = document.getElementById('loginOverlay');
+        const loginForm = document.getElementById('loginForm');
+        const adminApp = document.getElementById('adminApp');
+        const toast = document.getElementById('toast');
+        const metricsOverview = document.getElementById('metricsOverview');
+
+        const heroList = document.getElementById('heroList');
+        const memberList = document.getElementById('memberList');
+        const eventListAdmin = document.getElementById('eventListAdmin');
+        const statsList = document.getElementById('statsList');
+        const postList = document.getElementById('postList');
+        const applicationList = document.getElementById('applicationList');
+        const contactList = document.getElementById('contactList');
+
+        const addHeroBtn = document.getElementById('addHeroBtn');
+        const addMemberBtn = document.getElementById('addMemberBtn');
+        const addEventBtn = document.getElementById('addEventBtn');
+        const addStatBtn = document.getElementById('addStatBtn');
+        const addPostBtn = document.getElementById('addPostBtn');
+        const resetDataBtn = document.getElementById('resetDataBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        const clone = (value) => JSON.parse(JSON.stringify(value || []));
+        const escapeHTML = (value) => {
+            if (value === null || value === undefined) {
+                return '';
+            }
+            return value.toString()
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        };
+
+        const loadData = () => {
+            const defaults = getDefaults();
+            let stored = null;
+            if (typeof window.localStorage !== 'undefined') {
+                try {
+                    const raw = window.localStorage.getItem(storageKey);
+                    if (raw) {
+                        stored = JSON.parse(raw);
+                    }
+                } catch (error) {
+                    console.warn('Failed to load stored data', error);
+                }
+            }
+
+            const mergeArray = (candidate, fallback) => Array.isArray(candidate) ? candidate : fallback;
+            return {
+                heroSlides: clone(mergeArray(stored?.heroSlides, defaults.heroSlides)),
+                members: clone(mergeArray(stored?.members, defaults.members)),
+                events: clone(mergeArray(stored?.events, defaults.events)),
+                stats: clone(mergeArray(stored?.stats, defaults.stats)),
+                posts: clone(mergeArray(stored?.posts, defaults.posts)),
+                applications: clone(mergeArray(stored?.applications, defaults.applications || [])),
+                contactMessages: clone(mergeArray(stored?.contactMessages, defaults.contactMessages || []))
+            };
+        };
+
+        let siteData = loadData();
+
+        const toggleOverlay = (visible) => {
+            if (!loginOverlay) {
+                return;
+            }
+            loginOverlay.hidden = !visible;
+            loginOverlay.style.display = visible ? 'flex' : 'none';
+            loginOverlay.setAttribute('aria-hidden', visible ? 'false' : 'true');
+        };
+
+        const showToast = (message, tone = 'info') => {
+            if (!toast) {
+                return;
+            }
+            toast.textContent = message;
+            toast.style.background = tone === 'error' ? '#ef4444' : '#0ea5e9';
+            toast.hidden = false;
+            clearTimeout(showToast._timer);
+            showToast._timer = setTimeout(() => {
+                toast.hidden = true;
+            }, 2600);
+        };
+
+        const setSessionActive = (active) => {
+            try {
+                if (active) {
+                    window.sessionStorage.setItem(sessionKey, 'active');
+                } else {
+                    window.sessionStorage.removeItem(sessionKey);
+                }
+            } catch (error) {
+                console.warn('Session storage unavailable', error);
+            }
+        };
+
+        const isSessionActive = () => {
+            try {
+                return window.sessionStorage.getItem(sessionKey) === 'active';
+            } catch (error) {
+                console.warn('Session storage unavailable', error);
+                return false;
+            }
+        };
+
+        const saveData = (message) => {
+            if (typeof window.localStorage === 'undefined') {
+                showToast('Local storage unavailable. Changes cannot be saved.', 'error');
+                return;
+            }
+            try {
+                window.localStorage.setItem(storageKey, JSON.stringify(siteData));
+                renderAll();
+                if (message) {
+                    showToast(message);
+                }
+            } catch (error) {
+                console.error('Failed to save site data', error);
+                showToast('Unable to save changes. Check storage limits.', 'error');
+            }
+        };
+
+        const createId = (prefix) => {
+            if (window.crypto?.randomUUID) {
+                return `${prefix}-${window.crypto.randomUUID()}`;
+            }
+            return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+        };
+
+        const updateMetrics = () => {
+            if (!metricsOverview) {
+                return;
+            }
+            metricsOverview.innerHTML = '';
+            const metrics = [
+                { label: 'Hero Slides', value: siteData.heroSlides.length },
+                { label: 'Members', value: siteData.members.length },
+                { label: 'Events', value: siteData.events.length },
+                { label: 'Stats', value: siteData.stats.length },
+                { label: 'Posts', value: siteData.posts.length },
+                { label: 'Applications', value: siteData.applications?.length || 0 },
+                { label: 'Contact Messages', value: siteData.contactMessages?.length || 0 }
+            ];
+            metrics.forEach(metric => {
+                const card = document.createElement('article');
+                card.className = 'metric-card';
+                card.innerHTML = `
+                    <span class="metric-value">${metric.value}</span>
+                    <span class="metric-label">${metric.label}</span>
+                `;
+                metricsOverview.appendChild(card);
+            });
+        };
+
+        const renderHeroList = () => {
+            if (!heroList) {
+                return;
+            }
+            heroList.innerHTML = '';
+            if (!siteData.heroSlides.length) {
+                const empty = document.createElement('p');
+                empty.className = 'empty-state';
+                empty.textContent = 'No hero highlights yet. Add one to kick things off!';
+                heroList.appendChild(empty);
+                return;
+            }
+
+            siteData.heroSlides.forEach(slide => {
+                const form = document.createElement('form');
+                form.className = 'item-form';
+                form.dataset.id = slide.id;
+                form.innerHTML = `
+                    <div class="field">
+                        <label>Title
+                            <input name="title" value="${slide.title || ''}" required>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Subtitle
+                            <textarea name="subtitle" required>${slide.subtitle || ''}</textarea>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Call-to-action Text
+                            <input name="ctaText" value="${slide.ctaText || ''}" required>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Call-to-action Link
+                            <input name="ctaLink" value="${slide.ctaLink || ''}" placeholder="#about" required>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Background Gradient
+                            <input name="background" value="${slide.background || ''}" placeholder="linear-gradient(...)" required>
+                        </label>
+                        <span class="inline-hint">Use any valid CSS gradient or color value.</span>
+                    </div>
+                    <div class="field">
+                        <label>Highlight Badges (comma separated)
+                            <input name="meta" value="${Array.isArray(slide.meta) ? slide.meta.join(', ') : ''}">
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Image URL
+                            <input name="image" value="${slide.image || ''}" placeholder="https://">
+                        </label>
+                        <label>Image Alt Text
+                            <input name="imageAlt" value="${slide.imageAlt || ''}" placeholder="Describe the highlight image">
+                        </label>
+                    </div>
+                    <div class="actions">
+                        <button type="submit">Save Highlight</button>
+                        <button type="button" class="danger" data-action="delete">Delete</button>
+                    </div>
+                `;
+
+                form.addEventListener('submit', event => {
+                    event.preventDefault();
+                    const formData = new FormData(form);
+                    slide.title = formData.get('title')?.toString().trim() || 'MU Chatrodol Highlight';
+                    slide.subtitle = formData.get('subtitle')?.toString().trim() || '';
+                    slide.ctaText = formData.get('ctaText')?.toString().trim() || 'Learn More';
+                    slide.ctaLink = formData.get('ctaLink')?.toString().trim() || '#';
+                    slide.background = formData.get('background')?.toString().trim() || '#0ea5e9';
+                    const metaInput = formData.get('meta')?.toString() || '';
+                    slide.meta = metaInput
+                        .split(',')
+                        .map(item => item.trim())
+                        .filter(Boolean);
+                    slide.image = formData.get('image')?.toString().trim() || '';
+                    slide.imageAlt = formData.get('imageAlt')?.toString().trim() || '';
+                    saveData('Hero highlight updated');
+                });
+
+                form.querySelector('[data-action="delete"]').addEventListener('click', () => {
+                    siteData.heroSlides = siteData.heroSlides.filter(item => item.id !== slide.id);
+                    saveData('Hero highlight removed');
+                });
+
+                heroList.appendChild(form);
+            });
+        };
+
+        const renderMemberList = () => {
+            if (!memberList) {
+                return;
+            }
+            memberList.innerHTML = '';
+            if (!siteData.members.length) {
+                const empty = document.createElement('p');
+                empty.className = 'empty-state';
+                empty.textContent = 'No members added yet. Start building your team directory.';
+                memberList.appendChild(empty);
+                return;
+            }
+
+            siteData.members.forEach(member => {
+                const form = document.createElement('form');
+                form.className = 'item-form';
+                form.dataset.id = member.id;
+                form.innerHTML = `
+                    <div class="field">
+                        <label>Full Name
+                            <input name="name" value="${member.name || ''}" required>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Role / Title
+                            <input name="role" value="${member.role || ''}" required>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Member Type
+                            <select name="type" required>
+                                <option value="executive" ${member.type === 'executive' ? 'selected' : ''}>Executive</option>
+                                <option value="committee" ${member.type === 'committee' ? 'selected' : ''}>Committee</option>
+                                <option value="member" ${member.type === 'member' ? 'selected' : ''}>Member</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Department
+                            <input name="department" value="${member.department || ''}" required>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Profile Photo URL
+                            <input name="photo" value="${member.photo || ''}" placeholder="https://">
+                        </label>
+                        <span class="inline-hint">Leave blank if the photo is not ready yet.</span>
+                    </div>
+                    <div class="field">
+                        <label>Bio
+                            <textarea name="bio" required>${member.bio || ''}</textarea>
+                        </label>
+                    </div>
+                    <div class="actions">
+                        <button type="submit">Save Member</button>
+                        <button type="button" class="danger" data-action="delete">Remove</button>
+                    </div>
+                `;
+
+                form.addEventListener('submit', event => {
+                    event.preventDefault();
+                    const formData = new FormData(form);
+                    member.name = formData.get('name')?.toString().trim() || 'Team Member';
+                    member.role = formData.get('role')?.toString().trim() || '';
+                    member.type = formData.get('type')?.toString().trim() || 'member';
+                    member.department = formData.get('department')?.toString().trim() || '';
+                    member.photo = formData.get('photo')?.toString().trim() || '';
+                    member.bio = formData.get('bio')?.toString().trim() || '';
+                    saveData('Member updated');
+                });
+
+                form.querySelector('[data-action="delete"]').addEventListener('click', () => {
+                    siteData.members = siteData.members.filter(item => item.id !== member.id);
+                    saveData('Member removed');
+                });
+
+                memberList.appendChild(form);
+            });
+        };
+
+        const renderEventList = () => {
+            if (!eventListAdmin) {
+                return;
+            }
+            eventListAdmin.innerHTML = '';
+            if (!siteData.events.length) {
+                const empty = document.createElement('p');
+                empty.className = 'empty-state';
+                empty.textContent = 'No upcoming events scheduled.';
+                eventListAdmin.appendChild(empty);
+                return;
+            }
+
+            siteData.events.forEach(event => {
+                const form = document.createElement('form');
+                form.className = 'item-form';
+                form.dataset.id = event.id;
+                form.innerHTML = `
+                    <div class="field">
+                        <label>Event Title
+                            <input name="title" value="${event.title || ''}" required>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Event Date
+                            <input type="date" name="date" value="${event.date || ''}" required>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Description
+                            <textarea name="description" required>${event.description || ''}</textarea>
+                        </label>
+                    </div>
+                    <div class="actions">
+                        <button type="submit">Save Event</button>
+                        <button type="button" class="danger" data-action="delete">Remove</button>
+                    </div>
+                `;
+
+                form.addEventListener('submit', eventSubmit => {
+                    eventSubmit.preventDefault();
+                    const formData = new FormData(form);
+                    event.title = formData.get('title')?.toString().trim() || 'Upcoming Event';
+                    event.date = formData.get('date')?.toString() || '';
+                    event.description = formData.get('description')?.toString().trim() || '';
+                    saveData('Event updated');
+                });
+
+                form.querySelector('[data-action="delete"]').addEventListener('click', () => {
+                    siteData.events = siteData.events.filter(item => item.id !== event.id);
+                    saveData('Event removed');
+                });
+
+                eventListAdmin.appendChild(form);
+            });
+        };
+
+        const renderStatList = () => {
+            if (!statsList) {
+                return;
+            }
+            statsList.innerHTML = '';
+            if (!siteData.stats.length) {
+                const empty = document.createElement('p');
+                empty.className = 'empty-state';
+                empty.textContent = 'No impact metrics defined yet.';
+                statsList.appendChild(empty);
+                return;
+            }
+
+            siteData.stats.forEach(stat => {
+                const form = document.createElement('form');
+                form.className = 'item-form';
+                form.dataset.id = stat.id;
+                form.innerHTML = `
+                    <div class="field">
+                        <label>Label
+                            <input name="label" value="${stat.label || ''}" required>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Value
+                            <input name="value" type="number" step="1" value="${stat.value ?? 0}" required>
+                        </label>
+                    </div>
+                    <div class="actions">
+                        <button type="submit">Save Stat</button>
+                        <button type="button" class="danger" data-action="delete">Remove</button>
+                    </div>
+                `;
+
+                form.addEventListener('submit', event => {
+                    event.preventDefault();
+                    const formData = new FormData(form);
+                    stat.label = formData.get('label')?.toString().trim() || '';
+                    stat.value = Number(formData.get('value')) || 0;
+                    saveData('Impact stat updated');
+                });
+
+                form.querySelector('[data-action="delete"]').addEventListener('click', () => {
+                    siteData.stats = siteData.stats.filter(item => item.id !== stat.id);
+                    saveData('Impact stat removed');
+                });
+
+                statsList.appendChild(form);
+            });
+        };
+
+        const renderPostList = () => {
+            if (!postList) {
+                return;
+            }
+            postList.innerHTML = '';
+            if (!siteData.posts.length) {
+                const empty = document.createElement('p');
+                empty.className = 'empty-state';
+                empty.textContent = 'No news posts yet. Share your first update!';
+                postList.appendChild(empty);
+                return;
+            }
+
+            siteData.posts.forEach(post => {
+                const form = document.createElement('form');
+                form.className = 'item-form';
+                form.dataset.id = post.id;
+                const safeTitle = escapeHTML(post.title || '');
+                const safeDate = escapeHTML(post.date || '');
+                const safeSummary = escapeHTML(post.summary || '');
+                const safeContent = escapeHTML(post.content || '');
+                const safeImage = escapeHTML(post.image || '');
+                const safeImageAlt = escapeHTML(post.imageAlt || '');
+                form.innerHTML = `
+                    <div class="field">
+                        <label>Title
+                            <input name="title" value="${safeTitle}" required>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Publish Date
+                            <input type="date" name="date" value="${safeDate}" required>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Summary
+                            <textarea name="summary" required>${safeSummary}</textarea>
+                        </label>
+                        <span class="inline-hint">Appears on the News cards.</span>
+                    </div>
+                    <div class="field">
+                        <label>Feature Image URL
+                            <input name="image" value="${safeImage}" placeholder="https://">
+                        </label>
+                        <span class="inline-hint">Optional. Appears at the top of the post card.</span>
+                    </div>
+                    <div class="field">
+                        <label>Image Alt Text
+                            <input name="imageAlt" value="${safeImageAlt}" placeholder="Describe the image for screen readers">
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Full Content
+                            <textarea name="content">${safeContent}</textarea>
+                        </label>
+                    </div>
+                    <div class="actions">
+                        <button type="submit">Save Post</button>
+                        <button type="button" class="danger" data-action="delete">Remove</button>
+                    </div>
+                `;
+
+                form.addEventListener('submit', event => {
+                    event.preventDefault();
+                    const formData = new FormData(form);
+                    post.title = formData.get('title')?.toString().trim() || 'News Update';
+                    post.date = formData.get('date')?.toString() || '';
+                    post.summary = formData.get('summary')?.toString().trim() || '';
+                    post.image = formData.get('image')?.toString().trim() || '';
+                    post.imageAlt = formData.get('imageAlt')?.toString().trim() || '';
+                    post.content = formData.get('content')?.toString().trim() || '';
+                    saveData('News post updated');
+                });
+
+                form.querySelector('[data-action="delete"]').addEventListener('click', () => {
+                    siteData.posts = siteData.posts.filter(item => item.id !== post.id);
+                    saveData('News post removed');
+                });
+
+                postList.appendChild(form);
+            });
+        };
+
+        const renderApplicationList = () => {
+            if (!applicationList) {
+                return;
+            }
+            applicationList.innerHTML = '';
+            const applications = Array.isArray(siteData.applications) ? siteData.applications : [];
+            if (!applications.length) {
+                const empty = document.createElement('p');
+                empty.className = 'empty-state';
+                empty.textContent = 'No applications submitted yet.';
+                applicationList.appendChild(empty);
+                return;
+            }
+
+            applications.forEach(application => {
+                const form = document.createElement('form');
+                form.className = 'item-form';
+                form.dataset.id = application.id;
+                const submitted = application.submittedAt
+                    ? new Date(application.submittedAt).toLocaleString()
+                    : 'Unknown time';
+                const safeName = escapeHTML(application.name || '');
+                const safeEmail = escapeHTML(application.email || '');
+                const safePhone = escapeHTML(application.phone || '');
+                const safeDepartment = escapeHTML(application.department || '');
+                const safeProgram = escapeHTML(application.program || '');
+                const safeAvailability = escapeHTML(application.availability || '');
+                const safeMotivation = escapeHTML(application.motivation || '');
+                const statusValue = (application.status || 'new').toString();
+                form.innerHTML = `
+                    <div class="field">
+                        <label>Applicant
+                            <input name="name" value="${safeName}" readonly>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Email
+                            <input name="email" value="${safeEmail}" readonly>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Phone
+                            <input name="phone" value="${safePhone}" readonly>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Department
+                            <input name="department" value="${safeDepartment}" readonly>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Program Interest
+                            <input name="program" value="${safeProgram}" readonly>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Weekly Availability
+                            <input name="availability" value="${safeAvailability}" readonly>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Motivation
+                            <textarea name="motivation" readonly>${safeMotivation}</textarea>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Status
+                            <select name="status">
+                                <option value="new" ${statusValue === 'new' ? 'selected' : ''}>New</option>
+                                <option value="in-review" ${statusValue === 'in-review' ? 'selected' : ''}>In Review</option>
+                                <option value="accepted" ${statusValue === 'accepted' ? 'selected' : ''}>Accepted</option>
+                                <option value="archived" ${statusValue === 'archived' ? 'selected' : ''}>Archived</option>
+                            </select>
+                        </label>
+                        <span class="inline-hint">Submitted ${escapeHTML(submitted)}</span>
+                    </div>
+                    <div class="actions">
+                        <button type="submit">Save Status</button>
+                        <button type="button" class="danger" data-action="delete">Remove</button>
+                    </div>
+                `;
+
+                form.addEventListener('submit', event => {
+                    event.preventDefault();
+                    const formData = new FormData(form);
+                    application.status = formData.get('status')?.toString().trim() || 'new';
+                    saveData('Application updated');
+                });
+
+                form.querySelector('[data-action="delete"]').addEventListener('click', () => {
+                    if (!confirm('Remove this application from the dashboard?')) {
+                        return;
+                    }
+                    siteData.applications = applications.filter(item => item.id !== application.id);
+                    saveData('Application removed');
+                });
+
+                applicationList.appendChild(form);
+            });
+        };
+
+        const renderContactList = () => {
+            if (!contactList) {
+                return;
+            }
+            contactList.innerHTML = '';
+            const contacts = Array.isArray(siteData.contactMessages) ? siteData.contactMessages : [];
+            if (!contacts.length) {
+                const empty = document.createElement('p');
+                empty.className = 'empty-state';
+                empty.textContent = 'No contact messages yet. When someone reaches out, it will appear here.';
+                contactList.appendChild(empty);
+                return;
+            }
+
+            contacts.forEach(contact => {
+                const form = document.createElement('form');
+                form.className = 'item-form';
+                form.dataset.id = contact.id;
+                const submitted = contact.submittedAt
+                    ? new Date(contact.submittedAt).toLocaleString()
+                    : 'Unknown time';
+                const safeName = escapeHTML(contact.name || '');
+                const safeEmail = escapeHTML(contact.email || '');
+                const safeMessage = escapeHTML(contact.message || '');
+                const safeNotes = escapeHTML(contact.notes || '');
+                const statusValue = (contact.status || 'new').toString();
+                form.innerHTML = `
+                    <div class="field">
+                        <label>Name
+                            <input name="name" value="${safeName}" readonly>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Email
+                            <input name="email" value="${safeEmail}" readonly>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Message
+                            <textarea name="message" readonly>${safeMessage}</textarea>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label>Status
+                            <select name="status">
+                                <option value="new" ${statusValue === 'new' ? 'selected' : ''}>New</option>
+                                <option value="in-progress" ${statusValue === 'in-progress' ? 'selected' : ''}>In Progress</option>
+                                <option value="responded" ${statusValue === 'responded' ? 'selected' : ''}>Responded</option>
+                                <option value="archived" ${statusValue === 'archived' ? 'selected' : ''}>Archived</option>
+                            </select>
+                        </label>
+                        <span class="inline-hint">Received ${escapeHTML(submitted)}</span>
+                    </div>
+                    <div class="field">
+                        <label>Follow-up Notes
+                            <textarea name="notes" placeholder="Document your reply or next steps">${safeNotes}</textarea>
+                        </label>
+                    </div>
+                    <div class="actions">
+                        <button type="submit">Save Message</button>
+                        <button type="button" class="danger" data-action="delete">Remove</button>
+                    </div>
+                `;
+
+                form.addEventListener('submit', event => {
+                    event.preventDefault();
+                    const formData = new FormData(form);
+                    contact.status = formData.get('status')?.toString().trim() || 'new';
+                    contact.notes = formData.get('notes')?.toString().trim() || '';
+                    saveData('Contact message updated');
+                });
+
+                form.querySelector('[data-action="delete"]').addEventListener('click', () => {
+                    if (!confirm('Remove this contact message from the dashboard?')) {
+                        return;
+                    }
+                    siteData.contactMessages = contacts.filter(item => item.id !== contact.id);
+                    saveData('Contact message removed');
+                });
+
+                contactList.appendChild(form);
+            });
+        };
+
+        const renderAll = () => {
+            updateMetrics();
+            renderHeroList();
+            renderMemberList();
+            renderEventList();
+            renderStatList();
+            renderPostList();
+            renderApplicationList();
+            renderContactList();
+        };
+
+        const showDashboard = () => {
+            toggleOverlay(false);
+            if (adminApp) {
+                adminApp.hidden = false;
+                renderAll();
+            }
+        };
+
+        loginForm?.addEventListener('submit', event => {
+            event.preventDefault();
+            const formData = new FormData(loginForm);
+            const password = formData.get('password')?.toString().trim();
+            if (password === ADMIN_PASSWORD) {
+                setSessionActive(true);
+                showDashboard();
+                showToast('Welcome back, admin!');
+            } else {
+                showToast('Incorrect access key. Try again.', 'error');
+            }
+            loginForm.reset();
+        });
+
+        resetDataBtn?.addEventListener('click', () => {
+            if (!confirm('Reset all content to the default seed data? This cannot be undone.')) {
+                return;
+            }
+            siteData = getDefaults();
+            saveData('Content reset to defaults');
+        });
+
+        logoutBtn?.addEventListener('click', () => {
+            setSessionActive(false);
+            if (adminApp) {
+                adminApp.hidden = true;
+            }
+            toggleOverlay(true);
+            showToast('Signed out.');
+        });
+
+        addHeroBtn?.addEventListener('click', () => {
+            siteData.heroSlides.push({
+                id: createId('slide'),
+                title: 'New Highlight',
+                subtitle: 'Update this highlight to share a fresh story.',
+                ctaText: 'Learn More',
+                ctaLink: '#',
+                background: 'linear-gradient(135deg, #0ea5e9 0%, #10b981 100%)',
+                meta: ['New'],
+                image: '',
+                imageAlt: ''
+            });
+            saveData('Hero highlight added');
+        });
+
+        addMemberBtn?.addEventListener('click', () => {
+            siteData.members.push({
+                id: createId('member'),
+                name: 'New Member',
+                role: 'Role',
+                type: 'member',
+                department: 'Department',
+                photo: '',
+                bio: 'Add a short bio for this member.'
+            });
+            saveData('Member added');
+        });
+
+        addEventBtn?.addEventListener('click', () => {
+            const today = new Date().toISOString().split('T')[0];
+            siteData.events.push({
+                id: createId('event'),
+                title: 'New Event',
+                date: today,
+                description: 'Describe the upcoming event details here.'
+            });
+            saveData('Event added');
+        });
+
+        addStatBtn?.addEventListener('click', () => {
+            siteData.stats.push({
+                id: createId('stat'),
+                label: 'New Metric',
+                value: 0
+            });
+            saveData('Impact stat added');
+        });
+
+        addPostBtn?.addEventListener('click', () => {
+            const today = new Date().toISOString().split('T')[0];
+            siteData.posts.unshift({
+                id: createId('post'),
+                title: 'New Post',
+                date: today,
+                summary: 'Write a short summary for this update.',
+                content: '',
+                image: '',
+                imageAlt: ''
+            });
+            saveData('News post added');
+        });
+
+        if (isSessionActive()) {
+            showDashboard();
+        } else {
+            toggleOverlay(true);
+        }
+    </script>
+</body>
+</html>
