@@ -2053,10 +2053,32 @@
 
         const safeClone = (value) => JSON.parse(JSON.stringify(value || []));
 
-        const loadSiteData = () => {
+        const loadSiteData = async () => {
             const defaults = getDefaults();
+            
+            // Try loading from API first
+            try {
+                const response = await fetch('/api/data');
+                if (response.ok) {
+                    const serverData = await response.json();
+                    const mergeArray = (candidate, fallback) => Array.isArray(candidate) ? candidate : fallback;
+                    
+                    return {
+                        heroSlides: safeClone(mergeArray(serverData?.heroSlides, defaults.heroSlides)),
+                        members: safeClone(mergeArray(serverData?.members, defaults.members)),
+                        events: safeClone(mergeArray(serverData?.events, defaults.events)),
+                        stats: safeClone(mergeArray(serverData?.stats, defaults.stats)),
+                        posts: safeClone(mergeArray(serverData?.posts, defaults.posts)),
+                        applications: safeClone(mergeArray(serverData?.applications, defaults.applications || [])),
+                        contactMessages: safeClone(mergeArray(serverData?.contactMessages, defaults.contactMessages || []))
+                    };
+                }
+            } catch (error) {
+                console.warn('API not available, falling back to localStorage and defaults', error);
+            }
+            
+            // Fallback to localStorage
             let stored = null;
-
             if (typeof window.localStorage !== 'undefined') {
                 try {
                     const raw = window.localStorage.getItem(storageKey);
@@ -2081,14 +2103,49 @@
             };
         };
 
-        const siteData = loadSiteData();
-
-        const staticHeroSlides = Array.isArray(siteData.heroSlides) ? siteData.heroSlides : [];
-        const members = Array.isArray(siteData.members) ? siteData.members : [];
-        const events = Array.isArray(siteData.events) ? siteData.events : [];
-        const stats = Array.isArray(siteData.stats) ? siteData.stats : [];
-        const posts = Array.isArray(siteData.posts) ? siteData.posts : [];
+        // Initialize data asynchronously
+        let siteData = {};
+        let staticHeroSlides = [];
+        let members = [];
+        let events = [];
+        let stats = [];
+        let posts = [];
         let heroSlides = [];
+
+        (async () => {
+            siteData = await loadSiteData();
+            staticHeroSlides = Array.isArray(siteData.heroSlides) ? siteData.heroSlides : [];
+            members = Array.isArray(siteData.members) ? siteData.members : [];
+            events = Array.isArray(siteData.events) ? siteData.events : [];
+            stats = Array.isArray(siteData.stats) ? siteData.stats : [];
+            posts = Array.isArray(siteData.posts) ? siteData.posts : [];
+            
+            // Initialize hero slider after data loads
+            heroSlides = computeHeroSlides();
+            if (heroSlides.length && heroSliderEl) {
+                renderHeroSlides();
+                setHeroSlide(0);
+                startHeroAutoplay();
+            } else if (heroSection) {
+                heroSection.style.background = 'linear-gradient(135deg, #10b981 0%, #dc2626 100%)';
+            }
+            
+            // Render other content
+            loadMembers();
+            
+            setTimeout(() => {
+                const memberSection = document.getElementById('members');
+                if (memberSection) {
+                    revealFlowSection(memberSection);
+                }
+            }, 50);
+
+            setTimeout(() => {
+                renderStats();
+                renderEvents();
+                renderPosts();
+            }, 0);
+        })();
 
         // Hero slider references
         const statsGrid = document.getElementById('statsGrid');
@@ -2981,24 +3038,6 @@
                     setContactStatus('We received your message locally, but sending failed. We will still follow up!', 'error');
                 });
         });
-
-        // Load members immediately for faster page load
-        loadMembers();
-        
-        // Ensure member section is visible after content loads
-        setTimeout(() => {
-            const memberSection = document.getElementById('members');
-            if (memberSection) {
-                revealFlowSection(memberSection);
-            }
-        }, 50);
-
-        // Preload other content in background
-        setTimeout(() => {
-            renderStats();
-            renderEvents();
-            renderPosts();
-        }, 0);
 
     </script>
 </body>

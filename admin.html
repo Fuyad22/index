@@ -454,8 +454,32 @@
                 .replace(/'/g, '&#39;');
         };
 
-        const loadData = () => {
+        const loadData = async () => {
             const defaults = getDefaults();
+            
+            try {
+                // Try to load from API first
+                const response = await fetch('/api/data');
+                if (response.ok) {
+                    const serverData = await response.json();
+                    
+                    // Merge with defaults to ensure all fields exist
+                    const mergeArray = (candidate, fallback) => Array.isArray(candidate) ? candidate : fallback;
+                    return {
+                        heroSlides: clone(mergeArray(serverData?.heroSlides, defaults.heroSlides)),
+                        members: clone(mergeArray(serverData?.members, defaults.members)),
+                        events: clone(mergeArray(serverData?.events, defaults.events)),
+                        stats: clone(mergeArray(serverData?.stats, defaults.stats)),
+                        posts: clone(mergeArray(serverData?.posts, defaults.posts)),
+                        applications: clone(mergeArray(serverData?.applications, defaults.applications || [])),
+                        contactMessages: clone(mergeArray(serverData?.contactMessages, defaults.contactMessages || []))
+                    };
+                }
+            } catch (error) {
+                console.warn('Failed to load from API, trying localStorage', error);
+            }
+            
+            // Fallback to localStorage
             let stored = null;
             if (typeof window.localStorage !== 'undefined') {
                 try {
@@ -480,7 +504,12 @@
             };
         };
 
-        let siteData = loadData();
+        // Initialize data asynchronously
+        let siteData = {};
+        (async () => {
+            siteData = await loadData();
+            renderAll();
+        })();
 
         const toggleOverlay = (visible) => {
             if (!loginOverlay) {
@@ -525,20 +554,46 @@
             }
         };
 
-        const saveData = (message) => {
-            if (typeof window.localStorage === 'undefined') {
-                showToast('Local storage unavailable. Changes cannot be saved.', 'error');
-                return;
-            }
+        const saveData = async (message) => {
             try {
-                window.localStorage.setItem(storageKey, JSON.stringify(siteData));
+                showToast('Saving to server...', 'info');
+                
+                const response = await fetch('/api/data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(siteData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to save to server');
+                }
+                
+                const result = await response.json();
+                
+                // Also save to localStorage as backup
+                if (typeof window.localStorage !== 'undefined') {
+                    window.localStorage.setItem(storageKey, JSON.stringify(siteData));
+                }
+                
                 renderAll();
                 if (message) {
                     showToast(message);
                 }
             } catch (error) {
                 console.error('Failed to save site data', error);
-                showToast('Unable to save changes. Check storage limits.', 'error');
+                showToast('Unable to save to server. Saved locally only.', 'error');
+                
+                // Fallback to localStorage
+                if (typeof window.localStorage !== 'undefined') {
+                    try {
+                        window.localStorage.setItem(storageKey, JSON.stringify(siteData));
+                        renderAll();
+                    } catch (err) {
+                        console.error('LocalStorage also failed', err);
+                    }
+                }
             }
         };
 

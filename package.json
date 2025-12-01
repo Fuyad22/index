@@ -1,0 +1,17 @@
+{
+  "name": "mu-chatrodol",
+  "version": "1.0.0",
+  "description": "MU Chatrodol Student Organization Website",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static site - no build needed'"
+  },
+  "dependencies": {
+    "mongodb": "^6.3.0"
+  },
+  "devDependencies": {},
+  "keywords": ["student", "organization", "vercel"],
+  "author": "MU Chatrodol",
+  "license": "MIT"
+}
