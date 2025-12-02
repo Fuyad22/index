@@ -63,7 +63,7 @@ module.exports = async (req, res) => {
             res.status(200).json(data);
         } else if (req.method === 'POST') {
             // Update site data (admin only - add authentication here)
-            const { heroSlides, members, events, stats, posts, applications, contactMessages } = req.body;
+            const { heroSlides, members, events, stats, posts, about, activities, footer, applications, contactMessages } = req.body;
             
             const updateData = {
                 _id: 'main',
@@ -72,6 +72,9 @@ module.exports = async (req, res) => {
                 events,
                 stats,
                 posts,
+                about: about || {},
+                activities: activities || [],
+                footer: footer || {},
                 applications: applications || [],
                 contactMessages: contactMessages || [],
                 updatedAt: new Date()
