@@ -1849,18 +1849,16 @@
     </section>
 
     <section id="about" class="container flow-section">
-        <h2 class="section-title">About Us</h2>
-        <p class="section-subtitle">Building tomorrow's leaders today</p>
+        <h2 class="section-title" id="aboutSectionTitle">About Us</h2>
+        <p class="section-subtitle" id="aboutSectionSubtitle">Building tomorrow's leaders today</p>
         <div class="about-content">
             <div class="about-text">
-                <h3>Our Mission</h3>
-                <p>MU Chatrodol is a vibrant student organization dedicated to fostering leadership, academic excellence, and community engagement among students. We believe in creating opportunities for personal growth and meaningful connections.</p>
-                <p>Through various programs and initiatives, we strive to make a positive impact on campus and beyond, while supporting our members in their academic and personal development journey.</p>
+                <h3 id="aboutMissionTitle">Our Mission</h3>
+                <p id="aboutMissionText">MU Chatrodol is a vibrant student organization dedicated to fostering leadership, academic excellence, and community engagement among students. We believe in creating opportunities for personal growth and meaningful connections.</p>
             </div>
             <div class="about-text">
-                <h3>What We Stand For</h3>
-                <p>Our organization is built on the principles of inclusivity, innovation, and collaboration. We welcome students from all backgrounds and disciplines to join us in creating a supportive and dynamic community.</p>
-                <p>Together, we work towards making our campus a better place for everyone.</p>
+                <h3 id="aboutVisionTitle">What We Stand For</h3>
+                <p id="aboutVisionText">Our organization is built on the principles of inclusivity, innovation, and collaboration. We welcome students from all backgrounds and disciplines to join us in creating a supportive and dynamic community.</p>
             </div>
         </div>
         
@@ -1870,24 +1868,7 @@
     <section id="activities" class="container flow-section">
         <h2 class="section-title">Our Activities</h2>
         <p class="section-subtitle">Diverse programs for holistic development</p>
-        <div class="cards">
-            <div class="card">
-                <h3>Leadership Programs</h3>
-                <p>Develop your leadership skills through workshops, seminars, and hands-on experience in organizing events and managing projects.</p>
-            </div>
-            <div class="card">
-                <h3>Community Service</h3>
-                <p>Participate in meaningful community outreach programs and make a positive impact in the lives of others while building lasting friendships.</p>
-            </div>
-            <div class="card">
-                <h3>Social Events</h3>
-                <p>Connect with fellow students through fun social gatherings, cultural celebrations, and networking opportunities throughout the year.</p>
-            </div>
-            <div class="card">
-                <h3>Academic Support</h3>
-                <p>Access peer tutoring, study groups, and academic resources to help you succeed in your educational journey.</p>
-            </div>
-        </div>
+        <div class="cards" id="activitiesGrid"></div>
     </section>
 
     <section id="members" class="members-section container flow-section">
@@ -1940,7 +1921,8 @@
     </section>
 
     <footer>
-        <p>&copy; 2025 MU Chatrodol Student Organization. All rights reserved.</p>
+        <p id="footerText">&copy; 2025 MU Chatrodol Student Organization. All rights reserved.</p>
+        <p id="footerCredit" style="font-size: 0.9em; margin-top: 10px; opacity: 0.8;"></p>
     </footer>
 
     <div class="scroll-to-top" id="scrollToTop">↑</div>
@@ -2062,6 +2044,7 @@
                 if (response.ok) {
                     const serverData = await response.json();
                     const mergeArray = (candidate, fallback) => Array.isArray(candidate) ? candidate : fallback;
+                    const mergeObject = (candidate, fallback) => (candidate && typeof candidate === 'object') ? candidate : fallback;
                     
                     return {
                         heroSlides: safeClone(mergeArray(serverData?.heroSlides, defaults.heroSlides)),
@@ -2069,6 +2052,9 @@
                         events: safeClone(mergeArray(serverData?.events, defaults.events)),
                         stats: safeClone(mergeArray(serverData?.stats, defaults.stats)),
                         posts: safeClone(mergeArray(serverData?.posts, defaults.posts)),
+                        about: safeClone(mergeObject(serverData?.about, defaults.about || {})),
+                        activities: safeClone(mergeArray(serverData?.activities, defaults.activities || [])),
+                        footer: safeClone(mergeObject(serverData?.footer, defaults.footer || {})),
                         applications: safeClone(mergeArray(serverData?.applications, defaults.applications || [])),
                         contactMessages: safeClone(mergeArray(serverData?.contactMessages, defaults.contactMessages || []))
                     };
@@ -2091,6 +2077,7 @@
             }
 
             const mergeArray = (candidate, fallback) => Array.isArray(candidate) ? candidate : fallback;
+            const mergeObject = (candidate, fallback) => (candidate && typeof candidate === 'object') ? candidate : fallback;
 
             return {
                 heroSlides: safeClone(mergeArray(stored?.heroSlides, defaults.heroSlides)),
@@ -2098,6 +2085,9 @@
                 events: safeClone(mergeArray(stored?.events, defaults.events)),
                 stats: safeClone(mergeArray(stored?.stats, defaults.stats)),
                 posts: safeClone(mergeArray(stored?.posts, defaults.posts)),
+                about: safeClone(mergeObject(stored?.about, defaults.about || {})),
+                activities: safeClone(mergeArray(stored?.activities, defaults.activities || [])),
+                footer: safeClone(mergeObject(stored?.footer, defaults.footer || {})),
                 applications: safeClone(mergeArray(stored?.applications, defaults.applications || [])),
                 contactMessages: safeClone(mergeArray(stored?.contactMessages, defaults.contactMessages || []))
             };
@@ -2141,9 +2131,12 @@
             }, 50);
 
             setTimeout(() => {
+                renderAbout();
+                renderActivities();
                 renderStats();
                 renderEvents();
                 renderPosts();
+                renderFooter();
             }, 0);
         })();
 
@@ -2260,6 +2253,110 @@
                 `;
                 statsGrid.appendChild(card);
             });
+        };
+
+        const renderAbout = () => {
+            const about = siteData.about || {};
+            const titleEl = document.getElementById('aboutSectionTitle');
+            const subtitleEl = document.getElementById('aboutSectionSubtitle');
+            const missionTitleEl = document.getElementById('aboutMissionTitle');
+            const missionTextEl = document.getElementById('aboutMissionText');
+            const visionTitleEl = document.getElementById('aboutVisionTitle');
+            const visionTextEl = document.getElementById('aboutVisionText');
+
+            if (titleEl) titleEl.textContent = about.title || 'About Us';
+            if (subtitleEl) subtitleEl.textContent = about.subtitle || 'Building tomorrow\'s leaders today';
+            if (missionTitleEl) missionTitleEl.textContent = about.missionTitle || 'Our Mission';
+            if (missionTextEl) missionTextEl.textContent = about.missionText || '';
+            if (visionTitleEl) visionTitleEl.textContent = about.visionTitle || 'What We Stand For';
+            if (visionTextEl) visionTextEl.textContent = about.visionText || '';
+
+            // Display mission image if provided
+            if (about.missionImage) {
+                let missionImg = document.getElementById('aboutMissionImage');
+                if (!missionImg) {
+                    missionImg = document.createElement('img');
+                    missionImg.id = 'aboutMissionImage';
+                    missionImg.style.cssText = 'max-width: 100%; border-radius: 8px; margin-top: 10px;';
+                    missionTextEl?.parentElement?.appendChild(missionImg);
+                }
+                missionImg.src = about.missionImage;
+                missionImg.alt = about.missionTitle || 'Our Mission';
+            }
+
+            // Display vision image if provided
+            if (about.visionImage) {
+                let visionImg = document.getElementById('aboutVisionImage');
+                if (!visionImg) {
+                    visionImg = document.createElement('img');
+                    visionImg.id = 'aboutVisionImage';
+                    visionImg.style.cssText = 'max-width: 100%; border-radius: 8px; margin-top: 10px;';
+                    visionTextEl?.parentElement?.appendChild(visionImg);
+                }
+                visionImg.src = about.visionImage;
+                visionImg.alt = about.visionTitle || 'Our Vision';
+            }
+        };
+
+        const renderActivities = () => {
+            const activitiesGrid = document.getElementById('activitiesGrid');
+            if (!activitiesGrid) return;
+
+            activitiesGrid.innerHTML = '';
+            const activities = siteData.activities || [];
+
+            if (!activities.length) {
+                // Show default activities if none defined
+                const defaultActivities = [
+                    { title: 'Leadership Programs', description: 'Develop your leadership skills through workshops, seminars, and hands-on experience.' },
+                    { title: 'Community Service', description: 'Participate in meaningful community outreach programs.' },
+                    { title: 'Social Events', description: 'Connect with fellow students through fun social gatherings.' },
+                    { title: 'Academic Support', description: 'Access peer tutoring, study groups, and academic resources.' }
+                ];
+                
+                defaultActivities.forEach(activity => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <h3>${activity.title}</h3>
+                        <p>${activity.description}</p>
+                    `;
+                    activitiesGrid.appendChild(card);
+                });
+                return;
+            }
+
+            activities.forEach(activity => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                let imageHtml = '';
+                if (activity.image) {
+                    imageHtml = `<img src="${activity.image}" alt="${activity.title || 'Activity'}" style="max-width: 100%; border-radius: 8px; margin-bottom: 15px;">`;
+                }
+                card.innerHTML = `
+                    ${imageHtml}
+                    <h3>${activity.title || 'Activity'}</h3>
+                    <p>${activity.description || ''}</p>
+                `;
+                activitiesGrid.appendChild(card);
+            });
+        };
+
+        const renderFooter = () => {
+            const footer = siteData.footer || {};
+            const footerTextEl = document.getElementById('footerText');
+            const footerCreditEl = document.getElementById('footerCredit');
+
+            if (footerTextEl) {
+                footerTextEl.textContent = footer.text || '© 2025 MU Chatrodol Student Organization. All rights reserved.';
+            }
+
+            if (footerCreditEl && footer.showCredit && footer.credit) {
+                footerCreditEl.textContent = footer.credit;
+                footerCreditEl.style.display = 'block';
+            } else if (footerCreditEl) {
+                footerCreditEl.style.display = 'none';
+            }
         };
 
         const renderEvents = () => {

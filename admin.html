@@ -329,7 +329,6 @@
                 <input type="password" id="adminPass" name="password" autocomplete="current-password" required>
             </div>
             <button type="submit">Unlock Dashboard</button>
-            <p class="inline-hint">Default access key: <strong>mu-admin-2025</strong>. Change it after logging in.</p>
         </form>
     </div>
 
@@ -389,6 +388,81 @@
             <div id="postList"></div>
         </section>
 
+        <section class="panel" id="aboutPanel">
+            <header>
+                <h2>About Us Section</h2>
+            </header>
+            <p class="inline-hint">Edit the About Us section content displayed on the main page.</p>
+            <div id="aboutContent">
+                <div class="field">
+                    <label for="aboutTitle">Section Title</label>
+                    <input type="text" id="aboutTitle" placeholder="About Us">
+                </div>
+                <div class="field">
+                    <label for="aboutSubtitle">Subtitle</label>
+                    <input type="text" id="aboutSubtitle" placeholder="Building tomorrow's leaders today">
+                </div>
+                <div class="field">
+                    <label for="missionTitle">First Heading</label>
+                    <input type="text" id="missionTitle" placeholder="Our Mission">
+                </div>
+                <div class="field">
+                    <label for="missionText">First Content</label>
+                    <textarea id="missionText" rows="4" placeholder="Mission statement..."></textarea>
+                </div>
+                <div class="field">
+                    <label for="missionImage">First Section Image URL (optional)</label>
+                    <input type="url" id="missionImage" placeholder="https://example.com/image.jpg">
+                </div>
+                <div class="field">
+                    <label for="visionTitle">Second Heading</label>
+                    <input type="text" id="visionTitle" placeholder="What We Stand For">
+                </div>
+                <div class="field">
+                    <label for="visionText">Second Content</label>
+                    <textarea id="visionText" rows="4" placeholder="Vision statement..."></textarea>
+                </div>
+                <div class="field">
+                    <label for="visionImage">Second Section Image URL (optional)</label>
+                    <input type="url" id="visionImage" placeholder="https://example.com/image.jpg">
+                </div>
+                <button type="button" id="saveAboutBtn">Save About Us</button>
+            </div>
+        </section>
+
+        <section class="panel" id="activitiesPanel">
+            <header>
+                <h2>Activities Section</h2>
+                <button type="button" id="addActivityBtn">Add Activity</button>
+            </header>
+            <p class="inline-hint">Manage activity cards shown in the "Our Activities" section.</p>
+            <div id="activitiesList"></div>
+        </section>
+
+        <section class="panel" id="footerPanel">
+            <header>
+                <h2>Footer Settings</h2>
+            </header>
+            <p class="inline-hint">Customize footer text and website credits.</p>
+            <div id="footerContent">
+                <div class="field">
+                    <label for="footerText">Footer Text</label>
+                    <input type="text" id="footerText" placeholder="© 2025 MU Chatrodol Student Organization. All rights reserved.">
+                </div>
+                <div class="field">
+                    <label for="footerCredit">Website Builder Credit</label>
+                    <input type="text" id="footerCredit" placeholder="Built by Your Name">
+                </div>
+                <div class="field">
+                    <label>
+                        <input type="checkbox" id="showCredit">
+                        Show website builder credit
+                    </label>
+                </div>
+                <button type="button" id="saveFooterBtn">Save Footer</button>
+            </div>
+        </section>
+
         <section class="panel" id="applicationsPanel">
             <header>
                 <h2>Program Applications</h2>
@@ -414,7 +488,29 @@
         const storageKey = dataModule.STORAGE_KEY || 'mu-chatrodol-cms/v1';
         const getDefaults = typeof dataModule.getDefaultData === 'function'
             ? () => dataModule.getDefaultData()
-            : () => ({ heroSlides: [], members: [], events: [], stats: [], posts: [] });
+            : () => ({ 
+                heroSlides: [], 
+                members: [], 
+                events: [], 
+                stats: [], 
+                posts: [],
+                about: {
+                    title: 'About Us',
+                    subtitle: 'Building tomorrow\'s leaders today',
+                    missionTitle: 'Our Mission',
+                    missionText: 'MU Chatrodol is a vibrant student organization dedicated to fostering leadership, academic excellence, and community engagement among students.',
+                    missionImage: '',
+                    visionTitle: 'What We Stand For',
+                    visionText: 'Our organization is built on the principles of inclusivity, innovation, and collaboration.',
+                    visionImage: ''
+                },
+                activities: [],
+                footer: {
+                    text: '© 2025 MU Chatrodol Student Organization. All rights reserved.',
+                    credit: '',
+                    showCredit: false
+                }
+            });
 
         const sessionKey = 'mu-chatrodol-admin-session';
         const ADMIN_PASSWORD = 'mu-admin-2025';
@@ -465,12 +561,16 @@
                     
                     // Merge with defaults to ensure all fields exist
                     const mergeArray = (candidate, fallback) => Array.isArray(candidate) ? candidate : fallback;
+                    const mergeObject = (candidate, fallback) => (candidate && typeof candidate === 'object') ? { ...fallback, ...candidate } : fallback;
                     return {
                         heroSlides: clone(mergeArray(serverData?.heroSlides, defaults.heroSlides)),
                         members: clone(mergeArray(serverData?.members, defaults.members)),
                         events: clone(mergeArray(serverData?.events, defaults.events)),
                         stats: clone(mergeArray(serverData?.stats, defaults.stats)),
                         posts: clone(mergeArray(serverData?.posts, defaults.posts)),
+                        about: clone(mergeObject(serverData?.about, defaults.about)),
+                        activities: clone(mergeArray(serverData?.activities, defaults.activities)),
+                        footer: clone(mergeObject(serverData?.footer, defaults.footer)),
                         applications: clone(mergeArray(serverData?.applications, defaults.applications || [])),
                         contactMessages: clone(mergeArray(serverData?.contactMessages, defaults.contactMessages || []))
                     };
@@ -493,12 +593,16 @@
             }
 
             const mergeArray = (candidate, fallback) => Array.isArray(candidate) ? candidate : fallback;
+            const mergeObject = (candidate, fallback) => (candidate && typeof candidate === 'object') ? { ...fallback, ...candidate } : fallback;
             return {
                 heroSlides: clone(mergeArray(stored?.heroSlides, defaults.heroSlides)),
                 members: clone(mergeArray(stored?.members, defaults.members)),
                 events: clone(mergeArray(stored?.events, defaults.events)),
                 stats: clone(mergeArray(stored?.stats, defaults.stats)),
                 posts: clone(mergeArray(stored?.posts, defaults.posts)),
+                about: clone(mergeObject(stored?.about, defaults.about)),
+                activities: clone(mergeArray(stored?.activities, defaults.activities)),
+                footer: clone(mergeObject(stored?.footer, defaults.footer)),
                 applications: clone(mergeArray(stored?.applications, defaults.applications || [])),
                 contactMessages: clone(mergeArray(stored?.contactMessages, defaults.contactMessages || []))
             };
@@ -1175,6 +1279,49 @@
             });
         };
 
+        const renderAboutSection = () => {
+            const about = siteData.about || {};
+            document.getElementById('aboutTitle').value = about.title || '';
+            document.getElementById('aboutSubtitle').value = about.subtitle || '';
+            document.getElementById('missionTitle').value = about.missionTitle || '';
+            document.getElementById('missionText').value = about.missionText || '';
+            document.getElementById('missionImage').value = about.missionImage || '';
+            document.getElementById('visionTitle').value = about.visionTitle || '';
+            document.getElementById('visionText').value = about.visionText || '';
+            document.getElementById('visionImage').value = about.visionImage || '';
+        };
+
+        const renderFooterSection = () => {
+            const footer = siteData.footer || {};
+            document.getElementById('footerText').value = footer.text || '';
+            document.getElementById('footerCredit').value = footer.credit || '';
+            document.getElementById('showCredit').checked = footer.showCredit || false;
+        };
+
+        const renderActivitiesList = () => {
+            const activitiesList = document.getElementById('activitiesList');
+            if (!activitiesList) return;
+
+            activitiesList.innerHTML = '';
+            const activities = siteData.activities || [];
+
+            activities.forEach(activity => {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                const imageInfo = activity.image ? `<p><small>Image: ${escapeHtml(activity.image.substring(0, 50))}...</small></p>` : '';
+                card.innerHTML = `
+                    <h3>${escapeHtml(activity.title || '')}</h3>
+                    <p>${escapeHtml(activity.description || '')}</p>
+                    ${imageInfo}
+                    <div class="item-actions">
+                        <button type="button" data-action="edit" data-id="${activity.id}">Edit</button>
+                        <button type="button" data-action="delete" data-id="${activity.id}">Delete</button>
+                    </div>
+                `;
+                activitiesList.appendChild(card);
+            });
+        };
+
         const renderAll = () => {
             updateMetrics();
             renderHeroList();
@@ -1182,6 +1329,9 @@
             renderEventList();
             renderStatList();
             renderPostList();
+            renderAboutSection();
+            renderActivitiesList();
+            renderFooterSection();
             renderApplicationList();
             renderContactList();
         };
@@ -1285,6 +1435,80 @@
                 imageAlt: ''
             });
             saveData('News post added');
+        });
+
+        // About Section
+        const saveAboutBtn = document.getElementById('saveAboutBtn');
+        saveAboutBtn?.addEventListener('click', () => {
+            siteData.about = {
+                title: document.getElementById('aboutTitle').value,
+                subtitle: document.getElementById('aboutSubtitle').value,
+                missionTitle: document.getElementById('missionTitle').value,
+                missionText: document.getElementById('missionText').value,
+                missionImage: document.getElementById('missionImage').value,
+                visionTitle: document.getElementById('visionTitle').value,
+                visionText: document.getElementById('visionText').value,
+                visionImage: document.getElementById('visionImage').value
+            };
+            saveData('About section updated');
+        });
+
+        // Footer Section
+        const saveFooterBtn = document.getElementById('saveFooterBtn');
+        saveFooterBtn?.addEventListener('click', () => {
+            siteData.footer = {
+                text: document.getElementById('footerText').value,
+                credit: document.getElementById('footerCredit').value,
+                showCredit: document.getElementById('showCredit').checked
+            };
+            saveData('Footer updated');
+        });
+
+        // Activities Section
+        const addActivityBtn = document.getElementById('addActivityBtn');
+        const activitiesList = document.getElementById('activitiesList');
+
+        addActivityBtn?.addEventListener('click', () => {
+            if (!siteData.activities) siteData.activities = [];
+            siteData.activities.push({
+                id: createId('activity'),
+                title: 'New Activity',
+                description: 'Describe this activity or program.',
+                image: ''
+            });
+            saveData('Activity added');
+        });
+
+        activitiesList?.addEventListener('click', event => {
+            const btn = event.target.closest('button');
+            if (!btn) return;
+
+            const action = btn.dataset.action;
+            const id = btn.dataset.id;
+
+            if (action === 'delete') {
+                if (!confirm('Delete this activity?')) return;
+                siteData.activities = siteData.activities.filter(a => a.id !== id);
+                saveData('Activity deleted');
+            } else if (action === 'edit') {
+                const activity = siteData.activities.find(a => a.id === id);
+                if (!activity) return;
+
+                const title = prompt('Activity Title:', activity.title);
+                if (title === null) return;
+                activity.title = title;
+
+                const description = prompt('Activity Description:', activity.description);
+                if (description === null) return;
+                activity.description = description;
+
+                const image = prompt('Activity Image URL (optional):', activity.image || '');
+                if (image !== null) {
+                    activity.image = image;
+                }
+
+                saveData('Activity updated');
+            }
         });
 
         if (isSessionActive()) {

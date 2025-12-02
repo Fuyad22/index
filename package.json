@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "dotenv": "^17.2.3",
-    "mongodb": "^6.3.0"
+    "mongodb": "^6.21.0"
   },
   "keywords": [
     "student",
