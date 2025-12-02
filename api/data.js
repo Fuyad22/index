@@ -1,41 +1,16 @@
 const { MongoClient } = require('mongodb');
 
-const uri = process.env.MONGODB_URI;
-let cachedDb = null;
+const DATABASE_NAME = 'mu_chatrodol';
+const COLLECTION_NAME = 'sitedata';
+const DEFAULT_ID = 'main';
 
-async function connectToDatabase() {
-    if (cachedDb) {
-        return cachedDb;
-    }
-
-    const client = await MongoClient.connect(uri);
-    const db = client.db('mu_chatrodol');
-    cachedDb = db;
-    return db;
-}
-
-module.exports = async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
-
-    if (!uri) {
-        const defaults = {
-            heroSlides: [{
-                id: 'slide-1',
-                title: 'Welcome to MU Chatrodol',
-                subtitle: 'Empowering students, building community',
-                ctaText: 'Learn More',
-                ctaLink: '#about',
-                meta: ['150+ Members', '50 Events'],
-                background: 'linear-gradient(135deg, rgba(14,165,233,0.9) 0%, rgba(220,38,38,0.9) 100%)',
-                image: 'images/cover.jpg',
-                imageAlt: 'MU Chatrodol'
-            }],
+const getDefaultData = () => {
+    try {
+        return require('../site-data-default');
+    } catch (error) {
+        console.warn('Falling back to inline defaults', error);
+        return {
+            heroSlides: [],
             members: [],
             events: [],
             stats: [],
@@ -46,46 +21,112 @@ module.exports = async (req, res) => {
             applications: [],
             contactMessages: []
         };
-        return res.status(200).json(defaults);
+    }
+};
+
+const { MONGODB_URI } = process.env;
+let cachedClient = null;
+
+async function connectToDatabase() {
+    if (!MONGODB_URI) {
+        throw new Error('Missing MONGODB_URI environment variable');
+    }
+
+    if (cachedClient) {
+        return cachedClient;
+    }
+
+    const client = await MongoClient.connect(MONGODB_URI);
+    cachedClient = client;
+    return client;
+}
+
+async function readRequestBody(req) {
+    return new Promise((resolve, reject) => {
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk;
+            if (body.length > 1e7) {
+                reject(new Error('Request body too large'));
+                req.connection.destroy();
+            }
+        });
+        req.on('end', () => resolve(body));
+        req.on('error', reject);
+    });
+}
+
+module.exports = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Cache-Control', 'no-store');
+
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+
+    // If MongoDB is not configured, just serve defaults.
+    if (!MONGODB_URI) {
+        if (req.method === 'GET') {
+            res.status(200).json(getDefaultData());
+        } else {
+            res.status(503).json({ error: 'Database not configured. Configure MONGODB_URI to enable saving.' });
+        }
+        return;
     }
 
     try {
-        const db = await connectToDatabase();
-        const collection = db.collection('sitedata');
+        const client = await connectToDatabase();
+        const db = client.db(DATABASE_NAME);
+        const collection = db.collection(COLLECTION_NAME);
 
         if (req.method === 'GET') {
-            const data = await collection.findOne({ _id: 'main' });
-            if (!data) {
-                const defaults = {
-                    heroSlides: [],
-                    members: [],
-                    events: [],
-                    stats: [],
-                    posts: [],
-                    about: {},
-                    activities: [],
-                    footer: { text: '© 2025 MU Chatrodol', credit: '', showCredit: false },
-                    applications: [],
-                    contactMessages: []
-                };
-                return res.status(200).json(defaults);
-            }
-            return res.status(200).json(data);
+            const data = await collection.findOne({ _id: DEFAULT_ID });
+            res.status(200).json(data || getDefaultData());
+            return;
         }
 
         if (req.method === 'POST') {
-            const data = req.body;
+            const rawBody = await readRequestBody(req);
+            let payload = {};
+            if (rawBody) {
+                try {
+                    payload = JSON.parse(rawBody);
+                } catch (error) {
+                    res.status(400).json({ error: 'Invalid JSON payload' });
+                    return;
+                }
+            }
+
+            const sanitized = {
+                heroSlides: payload.heroSlides || [],
+                members: payload.members || [],
+                events: payload.events || [],
+                stats: payload.stats || [],
+                posts: payload.posts || [],
+                about: payload.about || {},
+                activities: payload.activities || [],
+                footer: payload.footer || {},
+                applications: payload.applications || [],
+                contactMessages: payload.contactMessages || [],
+                updatedAt: new Date()
+            };
+
             await collection.updateOne(
-                { _id: 'main' },
-                { $set: { ...data, _id: 'main', updatedAt: new Date() } },
+                { _id: DEFAULT_ID },
+                { $set: sanitized },
                 { upsert: true }
             );
-            return res.status(200).json({ success: true });
+
+            res.status(200).json({ success: true });
+            return;
         }
 
-        return res.status(405).json({ error: 'Method not allowed' });
+        res.status(405).json({ error: 'Method not allowed' });
     } catch (error) {
-        console.error('Error:', error);
-        return res.status(500).json({ error: error.message });
+        console.error('API error', error);
+        res.status(500).json({ error: 'Internal server error', details: error.message });
     }
 };
