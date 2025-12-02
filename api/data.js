@@ -36,6 +36,14 @@ module.exports = async (req, res) => {
         return;
     }
 
+    // Check if MongoDB is configured
+    if (!MONGODB_URI) {
+        console.warn('MONGODB_URI not configured, using default data');
+        const defaultData = require('../site-data-default.js');
+        res.status(200).json(defaultData);
+        return;
+    }
+
     try {
         const client = await connectToDatabase();
         const db = client.db(DB_NAME);
