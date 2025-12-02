@@ -2,7 +2,7 @@
 const { MongoClient } = require('mongodb');
 
 const MONGODB_URI = process.env.MONGODB_URI;
-const DB_NAME = 'mu-chatrodol';
+const DB_NAME = 'mu_chatrodol';
 const COLLECTION_NAME = 'sitedata';
 
 let cachedClient = null;
