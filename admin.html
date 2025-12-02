@@ -674,10 +674,13 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error('Failed to save to server');
+                    const errorText = await response.text();
+                    console.error('Server response:', response.status, errorText);
+                    throw new Error(`Failed to save to server: ${response.status}`);
                 }
                 
                 const result = await response.json();
+                console.log('Save successful:', result);
                 
                 // Also save to localStorage as backup
                 if (typeof window.localStorage !== 'undefined') {
