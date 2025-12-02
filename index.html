@@ -2031,18 +2031,34 @@
         const storageKey = dataModule.STORAGE_KEY || 'mu-chatrodol-cms/v1';
         const getDefaults = typeof dataModule.getDefaultData === 'function'
             ? () => dataModule.getDefaultData()
-            : () => ({ heroSlides: [], members: [], events: [], stats: [], posts: [], applications: [], contactMessages: [] });
+            : () => ({ 
+                heroSlides: [], 
+                members: [], 
+                events: [], 
+                stats: [], 
+                posts: [], 
+                about: {},
+                activities: [],
+                footer: {},
+                applications: [], 
+                contactMessages: [] 
+            });
 
         const safeClone = (value) => JSON.parse(JSON.stringify(value || []));
 
         const loadSiteData = async () => {
             const defaults = getDefaults();
             
+            console.log('Loading site data...');
+            console.log('Defaults:', defaults);
+            
             // Try loading from API first
             try {
                 const response = await fetch('/api/data');
+                console.log('API response status:', response.status);
                 if (response.ok) {
                     const serverData = await response.json();
+                    console.log('Server data loaded:', serverData);
                     const mergeArray = (candidate, fallback) => Array.isArray(candidate) ? candidate : fallback;
                     const mergeObject = (candidate, fallback) => (candidate && typeof candidate === 'object') ? candidate : fallback;
                     
