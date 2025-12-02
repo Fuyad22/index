@@ -12,6 +12,10 @@ async function connectToDatabase() {
         return cachedClient;
     }
     
+    if (!MONGODB_URI) {
+        return null;
+    }
+    
     const client = await MongoClient.connect(MONGODB_URI, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
@@ -21,7 +25,7 @@ async function connectToDatabase() {
     return client;
 }
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -94,4 +98,4 @@ module.exports = async (req, res) => {
         console.error('Database error:', error);
         res.status(500).json({ error: 'Internal server error', details: error.message });
     }
-};
+}
