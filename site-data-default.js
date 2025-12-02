@@ -21,6 +21,22 @@ module.exports = {
         { id: 'stat-3', label: 'Community Projects', value: 25 }
     ],
     posts: [],
+    about: {
+        title: 'About Us',
+        subtitle: 'Building tomorrow\'s leaders today',
+        missionTitle: 'Our Mission',
+        missionText: 'To empower students through leadership development, community service, and meaningful connections.',
+        missionImage: '',
+        visionTitle: 'What We Stand For',
+        visionText: 'We believe in creating positive change through collaboration, innovation, and service to our community.',
+        visionImage: ''
+    },
+    activities: [],
+    footer: {
+        text: '© 2025 MU Chatrodol Student Organization. All rights reserved.',
+        credit: '',
+        showCredit: false
+    },
     applications: [],
     contactMessages: []
 };
