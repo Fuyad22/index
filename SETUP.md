@@ -48,6 +48,11 @@ Updates site data (used by admin panel)
 npm run dev
 ```
 
+### Local-Only Persistence (No MongoDB)
+- If `MONGODB_URI` is not set, the app reads/writes data to `site-data-local.json` in the project root.
+- This ensures the admin panel still updates the site while you work offline.
+- Add the file to `.gitignore` (already done) so you don’t commit local content snapshots.
+
 ## Security Notes
 - The current API has no authentication
 - Add authentication before production use

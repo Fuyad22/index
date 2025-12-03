@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const { MongoClient } = require('mongodb');
@@ -10,6 +11,7 @@ const MONGODB_URI = process.env.MONGODB_URI || '';
 const DB_NAME = process.env.DB_NAME || 'mu_chatrodol';
 const COLLECTION_NAME = process.env.COLLECTION_NAME || 'sitedata';
 const DEFAULT_ID = process.env.DOCUMENT_ID || 'main';
+const LOCAL_DATA_FILE = path.join(__dirname, 'site-data-local.json');
 
 const getDefaultData = () => {
     try {
@@ -38,6 +40,21 @@ app.use(express.static(path.join(__dirname)));
 
 let cachedClient = null;
 
+function readLocalData() {
+    if (fs.existsSync(LOCAL_DATA_FILE)) {
+        try {
+            return JSON.parse(fs.readFileSync(LOCAL_DATA_FILE, 'utf-8'));
+        } catch (error) {
+            console.warn('Unable to parse local data file, falling back to defaults.', error);
+        }
+    }
+    return null;
+}
+
+function writeLocalData(data) {
+    fs.writeFileSync(LOCAL_DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
+}
+
 async function getDbClient() {
     if (!MONGODB_URI) {
         throw new Error('MONGODB_URI is not configured. Please set it in your .env file.');
@@ -55,7 +72,8 @@ async function getDbClient() {
 
 app.get('/api/data', async (req, res) => {
     if (!MONGODB_URI) {
-        res.status(200).json(getDefaultData());
+        const localData = readLocalData();
+        res.status(200).json(localData || getDefaultData());
         return;
     }
 
@@ -71,11 +89,6 @@ app.get('/api/data', async (req, res) => {
 });
 
 app.post('/api/data', async (req, res) => {
-    if (!MONGODB_URI) {
-        res.status(503).json({ error: 'MONGODB_URI is not configured. Unable to save to database.' });
-        return;
-    }
-
     try {
         const payload = req.body || {};
         const sanitized = {
@@ -91,6 +104,12 @@ app.post('/api/data', async (req, res) => {
             contactMessages: payload.contactMessages || [],
             updatedAt: new Date()
         };
+
+        if (!MONGODB_URI) {
+            writeLocalData(sanitized);
+            res.status(200).json({ success: true, source: 'local-file' });
+            return;
+        }
 
         const client = await getDbClient();
         const db = client.db(DB_NAME);
