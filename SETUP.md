@@ -1,8 +1,9 @@
-# MU Chatrodol - Setup Instructions for Backend API
+# MU Chatrodol - Local Backend Setup
 
 ## Prerequisites
-1. MongoDB Atlas account (free tier): https://www.mongodb.com/cloud/atlas
-2. Vercel account: https://vercel.com
+1. Node.js 18+ installed locally
+2. npm (ships with Node)
+3. MongoDB Atlas account (or any MongoDB connection string)
 
 ## Setup Steps
 
@@ -18,26 +19,20 @@
 npm install
 ```
 
-### 3. Configure Vercel Environment Variables
-```bash
-# Login to Vercel
-vercel login
-
-# Add MongoDB connection string as environment variable
-vercel env add MONGODB_URI
-
-# Paste your MongoDB connection string when prompted
+### 3. Configure Environment Variables
+Create a `.env` file based on `.env.example`:
+```
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<dbname>?retryWrites=true&w=majority
+DB_NAME=mu_chatrodol
+COLLECTION_NAME=sitedata
 ```
 
-Or add via Vercel Dashboard:
-1. Go to your project settings on Vercel
-2. Navigate to "Environment Variables"
-3. Add `MONGODB_URI` with your MongoDB connection string
-
-### 4. Deploy to Vercel
+### 4. Run Locally
 ```bash
-vercel --prod
+npm run dev
 ```
+
+Visit http://localhost:3000 to see the site and http://localhost:3000/admin.html for the admin dashboard.
 
 ## API Endpoints
 
@@ -50,11 +45,8 @@ Updates site data (used by admin panel)
 
 ## Local Development
 ```bash
-# Start local dev server
-vercel dev
+npm run dev
 ```
-
-Access admin panel at: http://localhost:3000/admin.html
 
 ## Security Notes
 - The current API has no authentication

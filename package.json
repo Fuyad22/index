@@ -2,13 +2,15 @@
   "name": "mu-chatrodol",
   "version": "1.0.0",
   "description": "MU Chatrodol Student Organization Website",
-  "main": "index.html",
+  "main": "server.js",
   "scripts": {
-    "dev": "vercel dev",
-    "build": "echo 'Static site - no build needed'"
+    "dev": "node server.js",
+    "start": "node server.js"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
+    "express": "^4.19.2",
     "mongodb": "^6.21.0"
   },
   "keywords": [
